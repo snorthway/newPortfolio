@@ -1,0 +1,19 @@
+body {
+	color: #BFB6AA;
+	margin: 0;
+}
+
+.navbar-banner {
+	
+	background-color: #000;
+}
+
+.navbar-banner > div {
+	position: relative;
+	width: 1111px;
+	margin: 0px auto;
+}
+
+#banner {
+	max-width: 100%;
+}

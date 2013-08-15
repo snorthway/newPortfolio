@@ -1,8 +1,11 @@
 import os
 from flask import Flask
+from flask_s3 import FlaskS3
 
 app = Flask(__name__)
-app.debug = False
+# app.config['S3_BUCKET_NAME'] = 'snorthway_portfolio'
+# s3 = FlaskS3(app)
+app.debug = True
 
 from views import *
 

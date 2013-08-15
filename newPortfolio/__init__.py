@@ -2,10 +2,17 @@ import os
 from flask import Flask
 from flask_s3 import FlaskS3
 
-app = Flask(__name__)
-app.config['S3_BUCKET_NAME'] = 'snorthway_portfolio'
 s3 = FlaskS3()
-s3.init_app(app)
+
+def start_app():
+	app = Flask(__name__)
+	s3.init_app(app)
+	return app
+
+app = start_app()
+
+app.config['S3_BUCKET_NAME'] = 'snorthway_portfolio'
+
 
 app.debug = True
 

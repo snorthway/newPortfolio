@@ -1,4 +1,4 @@
-from newPortfolio import app
+from newPortfolio import app, db_util
 from flask import render_template
 import os
 
@@ -8,3 +8,7 @@ import os
 @app.route('/')
 def home():
 	return render_template('home.html')
+
+@app.route('/rad/')
+def rad():
+	return render_template('rad.html')

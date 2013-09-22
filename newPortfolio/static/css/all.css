@@ -3,6 +3,10 @@ body {
 	margin: 0;
 }
 
+div {
+	margin-bottom: 20px;
+}
+
 .navbar-banner {
 	
 	background-color: #000;
@@ -16,4 +20,8 @@ body {
 
 #banner {
 	max-width: 100%;
+}
+
+.thumb {
+	max-width: 200px;
 }

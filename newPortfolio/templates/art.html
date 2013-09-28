@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block navbar %}
+{% include 'navbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="container one-third column">
+	<img src="{{ url_for('static', filename='photo/IMG_1953_edited-1.jpg') }}">
+</div>
+<div class="container one-third column">
+	<img src="{{ url_for('static', filename='photo/IMG_4392_edited-2.jpg') }}">
+</div>
+<div class="container one-third column">
+	<img src="{{ url_for('static', filename='photo/IMG_1254_edited-1.jpg') }}">
+</div>
+{% endblock %}

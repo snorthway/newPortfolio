@@ -9,6 +9,14 @@ import os
 def home():
 	return render_template('home.html')
 
-@app.route('/rad/')
-def rad():
-	return render_template('rad.html')
+@app.route('/contact')
+def contact():
+	return render_template('contact.html')
+
+@app.route('/art')
+def art():
+	return render_template('art.html')
+
+@app.route('/engineering')
+def engineering():
+	return render_template('engineering.html')

@@ -7,19 +7,20 @@
 		<meta name="description" content="Stephanie Northway: Engineer, Designer, Artist">
 		<!-- Links for CSS and JS go here -->
 		<link rel="stylesheet" href="{{ url_for('static', filename='css/all.css') }}" type="text/css" charset="utf-8" />
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/skeleton.css') }}">
 	</head>
-	<body style="background-image:url({{ url_for('static', filename='img/skewed_print.png')}}); background-repeat:repeat;">
+	<body>
 		<div id="nav-container">
-			<div class="navbar-banner">
+			<div class="container sixteen columns">
 				<div>
 					<img id="banner" src="{{ url_for('static', filename='img/banner.jpg') }}">
+					{% block navbar %}{% endblock %}
 				</div>
-				{% block navbar %}{% endblock %}
 			</div>
 		</div>
-		<div class="container">
+		<div class="container sixteen columns">
 			{% block content %}{% endblock %}
-			<footer class="span12">
+			<footer class="container sixteen columns">
 				<hr>
 				<p>&copy; Stephanie Northway 2013</p>
 			</footer>

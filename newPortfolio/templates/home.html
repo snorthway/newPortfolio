@@ -1,7 +1,16 @@
 {% extends "base.html" %}
 
+{% block navbar %}
+{% include "navbar.html" %}
+{% endblock %}
+
 {% block content %}
-<div>
-	<img class="thumb" src="{{ url_for('static', filename='photo/IMG_3043_edited-1.jpg') }}">
+<div class="container sixteen columns">
+	<div class="container four columns">
+		<img src="{{ url_for('static', filename='photo/IMG_3043_edited-1.jpg') }}">
+	</div>
+	<div class="container ten columns offset-by-one">
+		Hi! I'm Steph. I love doing teh codez and engineeringz.
+	</div>
 </div>
 {% endblock %}

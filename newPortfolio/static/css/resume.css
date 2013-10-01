@@ -1,0 +1,24 @@
+body {
+	background-color: black;
+	text-align: center;
+}
+
+ul {
+	list-style-type: none;
+}
+
+.paper-container {
+	text-align: left;
+	margin-left: auto;
+	margin-right: auto;
+	width: 8.5in;
+	/*height: 11in;*/
+	padding: 0.5in;
+	background-color: white;
+	font-family: 'Cantarell', sans-serif;
+}
+
+.right {
+	text-align: right;
+	margin-top: -20px;
+}

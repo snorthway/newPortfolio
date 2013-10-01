@@ -20,3 +20,7 @@ def art():
 @app.route('/engineering')
 def engineering():
 	return render_template('engineering.html')
+
+@app.route('/resume')
+def resume():
+	return render_template('resume.html')

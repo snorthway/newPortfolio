@@ -5,6 +5,20 @@ body {
 
 ul {
 	list-style-type: none;
+	margin-top: -20px;
+}
+
+li {
+	margin-bottom: 5px;
+}
+
+h1 {
+	font-variant: small-caps;
+	letter-spacing: 3px;
+}
+
+h4 {
+	margin-top: -10px;
 }
 
 .paper-container {

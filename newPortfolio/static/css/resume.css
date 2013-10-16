@@ -4,7 +4,7 @@ body {
 }
 
 ul {
-	list-style-type: none;
+	/*list-style-type: none;*/
 	margin-top: -20px;
 }
 
@@ -15,6 +15,11 @@ li {
 h1 {
 	font-variant: small-caps;
 	letter-spacing: 3px;
+	margin-top: 5px;
+}
+
+h2 {
+	margin-top: 10px;
 }
 
 h4 {
@@ -26,7 +31,7 @@ h4 {
 	margin-left: auto;
 	margin-right: auto;
 	width: 8.5in;
-	/*height: 11in;*/
+	height: 11in;
 	padding: 0.5in;
 	background-color: white;
 	font-family: 'Cantarell', sans-serif;
@@ -35,4 +40,9 @@ h4 {
 .right {
 	text-align: right;
 	margin-top: -20px;
+}
+
+.date {
+	text-align: right;
+	margin-top: -40px;
 }

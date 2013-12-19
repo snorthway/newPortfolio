@@ -10,70 +10,86 @@
 <script src="{{ url_for('static', filename='js/d3.v3.min.js') }}"></script>
 <script type="text/javascript">
 
+
 	d3.csv("{{ url_for('static', filename='gba_pop.csv')}}", function(csv){
 
 
 		var w=960, h=500;
 		var zx=w*(3/5), zy=h/2;
+		var scale = 750;
 
+		// so I don't have to type this a billion times
+		function centerPlace(d, axis){
+			if (axis == "x"){
+				return zx + scale*d["Long diff"]
+			} else if (axis == "y"){
+				return zy + scale*d["Lat diff"]
+			}
+		}
+
+		// make the svg element
 		svg=d3.select("#map")
 		.append("svg")
 		.attr("width",w)
 		.attr("height",h)
 		.style("background-color", "white")
 
-		// .append("circle")
-		// .style("fill","yellow")
-		// .attr("r", 20)
-		// .attr("cx", 50)
-		// .attr("cy", 50)
-		// .text("hello")
-		// .style("font-size", "12px")
-
-		// var someData = [
-		// {"cx": 20, "cy": 20, "radius": 20, "color": "green"},
-		// {"cx": 20, "cy": 70, "radius": 40, "color": "blue"}
-		// ]
-
+		// make the circles, give them csv as data
 		var circles = svg.selectAll("circle")
 		.data(csv)
 		.enter()
 		.append("circle");
 
-		// console.log(csv);
-		// console.log(someData);
-
+		//style and position
 		var circleAttributes = circles
 		.style("stroke", "gray")
 		.style("fill", "yellow")
 		.attr("r", 5)
-		.attr("cx", function (d){return zx + 750*d["Long diff"]})
-		.attr("cy", function (d){return zy + 750*d["Lat diff"]});
+		.attr("cx", function (d){return centerPlace(d, "x")})
+		.attr("cy", function (d){return centerPlace(d, "y")});
 
+		// make the labels, give them csv as data
 		var labels = svg.selectAll("text")
 		.data(csv)
 		.enter()
 		.append("text");
 
+		// style and position and text
 		var labelAttributes = labels
 		.style("font-size", 10)
-		.attr("x", function (d){return zx + 750*d["Long diff"]})
-		.attr("y", function (d){return zy + 750*d["Lat diff"]})
+		.attr("x", function (d){return centerPlace(d, "x")})
+		.attr("y", function (d){return centerPlace(d, "y")})
 		.text(function (d){return d["City"]});
 
+		// same shit for edges
+		var edges = svg.selectAll("line")
+		.data(csv)
+		.enter()
+		.append("line")
 
+		// more of the same shit
+		var edgeAttributes = edges
+		.style("stroke", "gray")
+		.style("stroke-width", 2)
+
+		console.log(csv.length)
+
+		// make the distance matrix as a basis for finding MST
+		var distanceMatrix = []
+		for (var i=0; i<csv.length; i++){
+			distanceMatrix.push([]);
+			c1 = csv[i]
+			for (var j=0; j<csv.length; j++){
+				c2 = csv[j]
+				hyp = Math.sqrt(Math.pow(c1["Latitude (N)"]-c2["Latitude (N)"],2)+Math.pow(c1["Longitude (W)"]-c2["Longitude (W)"],2));
+				distanceMatrix[i].push(hyp);
+			}
+		}
+
+		
 
 	});
 
-	// svg.selectAll("circle")
- //    .data(dataset)
- //    .enter().append("circle")
- //    .style("stroke", "gray")
- //    .style("fill", "yellow")
- //    .attr("height", 40)
- //    .attr("r", 40)
- //    .attr("cx", function(d, i){return 40+i*80})
- //    .attr("cy", 50);
 	
 </script>
 {% endblock %}

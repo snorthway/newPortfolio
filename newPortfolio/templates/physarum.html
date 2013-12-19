@@ -9,7 +9,7 @@
 {% block extrajs %}
 <script src="{{ url_for('static', filename='js/d3.v3.min.js') }}"></script>
 <script type="text/javascript">
-
+//Ugly code, completely written between 8PM on Dec. 18 and 5AM on Dec 19
 
 	d3.csv("{{ url_for('static', filename='gba_pop.csv')}}", function(csv){
 

@@ -13,10 +13,77 @@
 
 	d3.csv("{{ url_for('static', filename='gba_pop.csv')}}", function(csv){
 
-
+		// sum varz
 		var w=960, h=500;
 		var zx=w*(3/5), zy=h/2;
 		var scale = 750;
+		var big = 1000;
+
+		// make the distance matrix as a basis for finding MST
+		var distanceMatrix = []
+		for (var i=0; i<csv.length; i++){
+			distanceMatrix.push([]);
+			c1 = csv[i]
+			for (var j=0; j<csv.length; j++){
+				c2 = csv[j]
+				hyp = Math.sqrt(Math.pow(c1["Latitude (N)"]-c2["Latitude (N)"],2)+Math.pow(c1["Longitude (W)"]-c2["Longitude (W)"],2));
+				if (hyp == 0){
+					distanceMatrix[i].push(big);
+				} else{
+					distanceMatrix[i].push(hyp);
+				}	
+			}
+		}
+
+		// append the data to csv info
+		for (var i=0; i<csv.length; i++){
+			csv[i].dists = distanceMatrix[i];
+			csv[i].connected = false;
+			csv[i].connections = [];
+		}
+
+		// find the minimum spanning tree
+		function findMST(data, r){
+			if (r == false){
+				var indexOfMin = data[0].dists.indexOf(Math.min.apply(null, data[0].dists));
+				console.log(indexOfMin);
+				data[0].connections.push(indexOfMin);
+				data[0].connected = true;
+				data[0].dists[indexOfMin] = big;
+				data[indexOfMin].connected = true;
+				data[indexOfMin].dists[0] = big;
+				findMST(data, true);
+			} else {
+				console.log(data[16].connected);
+				var conNodes = data.filter(function (d){return d.connected == true});
+				console.log(data[16].connected);
+				var indexOfMin = -1;
+				for (i=0;i<conNodes.length;i++){
+					if (i==0){
+						indexOfMin = conNodes[i].dists.indexOf(Math.min.apply(null, conNodes[i].dists));
+						conNodeIndex = i;
+					} else {
+						newIndex = conNodes[i].dists.indexOf(Math.min.apply(null, conNodes[i].dists));
+						if (newIndex < indexOfMin){
+							indexOfMin = newIndex;
+							conNodeIndex = i;
+						}
+					}
+				}
+				var oldNodeIndex = data.indexOf(conNodes[conNodeIndex]);
+				data[oldNodeIndex].connections.push(indexOfMin);
+				data[oldNodeIndex].dists[indexOfMin] = big;
+				data[indexOfMin].connected = true;
+				data[indexOfMin].dists[oldNodeIndex] = big;
+				console.log(indexOfMin);
+
+				if (data.every(function (d){return d.connected == true})){
+					return data;
+				} else {
+					findMST(data, true);
+				}
+			}
+		}
 
 		// so I don't have to type this a billion times
 		function centerPlace(d, axis){
@@ -26,6 +93,10 @@
 				return zy + scale*d["Lat diff"]
 			}
 		}
+
+		// console.log(Math.min.apply(null, csv[0].dists));
+		newData = findMST(csv, false);
+		// console.log(newData);
 
 		// make the svg element
 		svg=d3.select("#map")
@@ -72,21 +143,7 @@
 		.style("stroke", "gray")
 		.style("stroke-width", 2)
 
-		console.log(csv.length)
 
-		// make the distance matrix as a basis for finding MST
-		var distanceMatrix = []
-		for (var i=0; i<csv.length; i++){
-			distanceMatrix.push([]);
-			c1 = csv[i]
-			for (var j=0; j<csv.length; j++){
-				c2 = csv[j]
-				hyp = Math.sqrt(Math.pow(c1["Latitude (N)"]-c2["Latitude (N)"],2)+Math.pow(c1["Longitude (W)"]-c2["Longitude (W)"],2));
-				distanceMatrix[i].push(hyp);
-			}
-		}
-
-		
 
 	});
 

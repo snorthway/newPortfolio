@@ -19,6 +19,22 @@
 		var scale = 750;
 		var big = 1000;
 
+		// so I don't have to type this a billion times
+		function centerPlace(d, axis){
+			if (axis == "x"){
+				return zx + scale*d["Long diff"];
+			} else if (axis == "y"){
+				return zy + scale*d["Lat diff"];
+			}
+		}
+
+		// make the svg element
+		svg=d3.select("#map")
+		.append("svg")
+		.attr("width",w)
+		.attr("height",h)
+		.style("background-color", "white");
+
 		// make the distance matrix as a basis for finding MST
 		var distanceMatrix = []
 		for (var i=0; i<csv.length; i++){
@@ -39,71 +55,84 @@
 		for (var i=0; i<csv.length; i++){
 			csv[i].dists = distanceMatrix[i];
 			csv[i].connected = false;
-			csv[i].connections = [];
 		}
+		csv.connections = []
 
 		// find the minimum spanning tree
 		function findMST(data, r){
 			if (r == false){
 				var indexOfMin = data[0].dists.indexOf(Math.min.apply(null, data[0].dists));
-				console.log(indexOfMin);
-				data[0].connections.push(indexOfMin);
+				data.connections.push([0,indexOfMin]);
 				data[0].connected = true;
 				data[0].dists[indexOfMin] = big;
 				data[indexOfMin].connected = true;
 				data[indexOfMin].dists[0] = big;
+
+				// draw lines here because I suck
+				svg.append("line")
+				.style("stroke-width", 2)
+				.style("stroke", "gray")
+				.attr("x1",centerPlace(data[0],"x"))
+				.attr("y1",centerPlace(data[0],"y"))
+				.attr("x2",centerPlace(data[indexOfMin],"x"))
+				.attr("y2",centerPlace(data[indexOfMin],"y"));
+
+				// recurse!
 				findMST(data, true);
 			} else {
-				console.log(data[16].connected);
 				var conNodes = data.filter(function (d){return d.connected == true});
-				console.log(data[16].connected);
+				// console.log(conNodes.length);
+				// initialize to something that will error
 				var indexOfMin = -1;
+				var conNodeIndex = -1;
 				for (i=0;i<conNodes.length;i++){
 					if (i==0){
-						indexOfMin = conNodes[i].dists.indexOf(Math.min.apply(null, conNodes[i].dists));
+						var conNodeMin = Math.min.apply(null, conNodes[i].dists);
+						indexOfMin = conNodes[i].dists.indexOf(conNodeMin);
 						conNodeIndex = i;
 					} else {
-						newIndex = conNodes[i].dists.indexOf(Math.min.apply(null, conNodes[i].dists));
-						if (newIndex < indexOfMin){
+						newConNodeMin = Math.min.apply(null, conNodes[i].dists);
+						var newIndex = conNodes[i].dists.indexOf(newConNodeMin);
+						if (newConNodeMin < conNodeMin){
 							indexOfMin = newIndex;
 							conNodeIndex = i;
 						}
 					}
+					// console.log(indexOfMin);
 				}
 				var oldNodeIndex = data.indexOf(conNodes[conNodeIndex]);
-				data[oldNodeIndex].connections.push(indexOfMin);
+				data.connections.push([oldNodeIndex, indexOfMin]);
 				data[oldNodeIndex].dists[indexOfMin] = big;
 				data[indexOfMin].connected = true;
 				data[indexOfMin].dists[oldNodeIndex] = big;
-				console.log(indexOfMin);
+
+				// draw lines here because I suck
+				svg.append("line")
+				.style("stroke-width", 2)
+				.style("stroke", "gray")
+				.attr("x1",centerPlace(data[oldNodeIndex],"x"))
+				.attr("y1",centerPlace(data[oldNodeIndex],"y"))
+				.attr("x2",centerPlace(data[indexOfMin],"x"))
+				.attr("y2",centerPlace(data[indexOfMin],"y"));
 
 				if (data.every(function (d){return d.connected == true})){
+					// console.log(data);
 					return data;
 				} else {
+					// console.log(data.filter(function (d){return d.connected == false}).length);
+					// recurse!
 					findMST(data, true);
 				}
 			}
 		}
 
-		// so I don't have to type this a billion times
-		function centerPlace(d, axis){
-			if (axis == "x"){
-				return zx + scale*d["Long diff"]
-			} else if (axis == "y"){
-				return zy + scale*d["Lat diff"]
-			}
-		}
+
 
 		// console.log(Math.min.apply(null, csv[0].dists));
 		newData = findMST(csv, false);
-		// console.log(newData);
+		console.log(newData);
 
-		// make the svg element
-		svg=d3.select("#map")
-		.append("svg")
-		.attr("width",w)
-		.attr("height",h)
-		.style("background-color", "white")
+
 
 		// make the circles, give them csv as data
 		var circles = svg.selectAll("circle")
@@ -132,18 +161,16 @@
 		.attr("y", function (d){return centerPlace(d, "y")})
 		.text(function (d){return d["City"]});
 
-		// same shit for edges
-		var edges = svg.selectAll("line")
-		.data(csv)
-		.enter()
-		.append("line")
+		// // same shit for edges
+		// var edges = svg.selectAll("line")
+		// .data(newData)
+		// .enter()
+		// .append("line");
 
-		// more of the same shit
-		var edgeAttributes = edges
-		.style("stroke", "gray")
-		.style("stroke-width", 2)
-
-
+		// // more of the same shit
+		// var edgeAttributes = edges
+		// .style("stroke", "gray")
+		// .style("stroke-width", 2);
 
 	});
 

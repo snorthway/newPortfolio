@@ -94,17 +94,31 @@
 						newConNodeMin = Math.min.apply(null, conNodes[i].dists);
 						var newIndex = conNodes[i].dists.indexOf(newConNodeMin);
 						if (newConNodeMin < conNodeMin){
+							conNodeMin = newConNodeMin;
 							indexOfMin = newIndex;
 							conNodeIndex = i;
 						}
 					}
-					// console.log(indexOfMin);
+					
 				}
+				
+
 				var oldNodeIndex = data.indexOf(conNodes[conNodeIndex]);
+				if (conNodes.length == 15){console.log(oldNodeIndex);}
 				data.connections.push([oldNodeIndex, indexOfMin]);
 				data[oldNodeIndex].dists[indexOfMin] = big;
 				data[indexOfMin].connected = true;
 				data[indexOfMin].dists[oldNodeIndex] = big;
+
+				data.forEach(function(entry){
+					if (entry.connected == true){
+						for (i=0;i<data.length;i++){
+							if (data[i].connected == true){
+								entry.dists[i] = big;
+							}
+						}
+					}
+				});
 
 				// draw lines here because I suck
 				svg.append("line")
@@ -116,7 +130,7 @@
 				.attr("y2",centerPlace(data[indexOfMin],"y"));
 
 				if (data.every(function (d){return d.connected == true})){
-					// console.log(data);
+					console.log(data);
 					return data;
 				} else {
 					// console.log(data.filter(function (d){return d.connected == false}).length);

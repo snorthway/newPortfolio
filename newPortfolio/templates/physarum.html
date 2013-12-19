@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Physarum Boston Model{% endblock %}
+
+{% block content %}
+	<div id="map"></div>
+{% endblock %}
+
+{% block extrajs %}
+<script src="{{ url_for('static', filename='js/d3.v3.min.js') }}"></script>
+<script type="text/javascript">
+
+	d3.csv("{{ url_for('static', filename='gba_pop.csv')}}", function(csv){
+
+
+		var w=960, h=500;
+		var zx=w*(3/5), zy=h/2;
+
+		svg=d3.select("#map")
+		.append("svg")
+		.attr("width",w)
+		.attr("height",h)
+		.style("background-color", "white")
+
+		// .append("circle")
+		// .style("fill","yellow")
+		// .attr("r", 20)
+		// .attr("cx", 50)
+		// .attr("cy", 50)
+		// .text("hello")
+		// .style("font-size", "12px")
+
+		// var someData = [
+		// {"cx": 20, "cy": 20, "radius": 20, "color": "green"},
+		// {"cx": 20, "cy": 70, "radius": 40, "color": "blue"}
+		// ]
+
+		var circles = svg.selectAll("circle")
+		.data(csv)
+		.enter()
+		.append("circle");
+
+		// console.log(csv);
+		// console.log(someData);
+
+		var circleAttributes = circles
+		.style("stroke", "gray")
+		.style("fill", "yellow")
+		.attr("r", 5)
+		.attr("cx", function (d){return zx + 750*d["Long diff"]})
+		.attr("cy", function (d){return zy + 750*d["Lat diff"]});
+
+		var labels = svg.selectAll("text")
+		.data(csv)
+		.enter()
+		.append("text");
+
+		var labelAttributes = labels
+		.style("font-size", 10)
+		.attr("x", function (d){return zx + 750*d["Long diff"]})
+		.attr("y", function (d){return zy + 750*d["Lat diff"]})
+		.text(function (d){return d["City"]});
+
+
+
+	});
+
+	// svg.selectAll("circle")
+ //    .data(dataset)
+ //    .enter().append("circle")
+ //    .style("stroke", "gray")
+ //    .style("fill", "yellow")
+ //    .attr("height", 40)
+ //    .attr("r", 40)
+ //    .attr("cx", function(d, i){return 40+i*80})
+ //    .attr("cy", 50);
+	
+</script>
+{% endblock %}

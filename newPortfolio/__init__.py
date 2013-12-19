@@ -14,7 +14,7 @@ app = start_app()
 app.config['S3_BUCKET_NAME'] = 'snorthway_portfolio'
 
 
-app.debug = False
+app.debug = True
 
 from views import *
 

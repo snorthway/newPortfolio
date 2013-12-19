@@ -24,3 +24,7 @@ def engineering():
 @app.route('/resume')
 def resume():
 	return render_template('resume.html')
+
+@app.route('/physarum')
+def physarum():
+	return render_template('physarum.html')

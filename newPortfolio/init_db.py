@@ -21,11 +21,12 @@ photos = []
 
 for f in os.listdir(photo_path):
 	date = scrape_date(os.path.join(photo_path, f))
-	m = re.search(r"_(?P<photo_num>\d+)_")
-	if m is not None:
-		photos.append((m, date))
-	else:
-		photos.append(('2013', date))
+
+	try:
+		id_num = re.search(r"_(?P<photo_num>\d+)_")
+		photos.append(id_num, date)
+	except:
+		pass
 	
 
 def scrape_date(path):

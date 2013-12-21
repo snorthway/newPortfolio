@@ -11,10 +11,10 @@
 <script type="text/javascript">
 //Ugly code, completely written between 8PM on Dec. 18 and 5AM on Dec 19
 
-	d3.csv("{{ url_for('static', filename='gba_pop.csv')}}", function(csv){
+	d3.csv("{{ url_for('static', filename='other/gba_pop.csv')}}", function(csv){
 
 		// sum varz
-		var w=960, h=500;
+		var w=960, h=900;
 		var zx=w*(3/5), zy=h/2;
 		var scale = 750;
 		var big = 1000;
@@ -28,12 +28,30 @@
 			}
 		}
 
+		function drawLine(loc1, loc2, color){
+			svg.append("line")
+			.style("stroke-width", 2)
+			.style("stroke", color)
+			.attr("x1",centerPlace(loc1,"x"))
+			.attr("y1",centerPlace(loc1,"y"))
+			.attr("x2",centerPlace(loc2,"x"))
+			.attr("y2",centerPlace(loc2,"y"));
+		}
+
 		// make the svg element
 		svg=d3.select("#map")
 		.append("svg")
 		.attr("width",w)
 		.attr("height",h)
 		.style("background-color", "white");
+
+		// petri dish photo
+		svg.append("svg:image")
+		.attr("xlink:href", "{{ url_for('static', filename='other/petri_light_bw.JPG')}}")
+		.attr("x",180)
+		.attr("y",150)
+		.attr("height", 600)
+		.attr("width", 600);
 
 		// make the distance matrix as a basis for finding MST
 		var distanceMatrix = []
@@ -55,6 +73,7 @@
 		for (var i=0; i<csv.length; i++){
 			csv[i].dists = distanceMatrix[i];
 			csv[i].connected = false;
+			csv[i].clicked = false;
 		}
 		csv.connections = []
 
@@ -69,19 +88,12 @@
 				data[indexOfMin].dists[0] = big;
 
 				// draw lines here because I suck
-				svg.append("line")
-				.style("stroke-width", 2)
-				.style("stroke", "gray")
-				.attr("x1",centerPlace(data[0],"x"))
-				.attr("y1",centerPlace(data[0],"y"))
-				.attr("x2",centerPlace(data[indexOfMin],"x"))
-				.attr("y2",centerPlace(data[indexOfMin],"y"));
+				drawLine(data[0], data[indexOfMin], "yellow");
 
 				// recurse!
 				findMST(data, true);
 			} else {
 				var conNodes = data.filter(function (d){return d.connected == true});
-				// console.log(conNodes.length);
 				// initialize to something that will error
 				var indexOfMin = -1;
 				var conNodeIndex = -1;
@@ -101,7 +113,6 @@
 					}
 					
 				}
-				
 
 				var oldNodeIndex = data.indexOf(conNodes[conNodeIndex]);
 				if (conNodes.length == 15){console.log(oldNodeIndex);}
@@ -121,31 +132,22 @@
 				});
 
 				// draw lines here because I suck
-				svg.append("line")
-				.style("stroke-width", 2)
-				.style("stroke", "gray")
-				.attr("x1",centerPlace(data[oldNodeIndex],"x"))
-				.attr("y1",centerPlace(data[oldNodeIndex],"y"))
-				.attr("x2",centerPlace(data[indexOfMin],"x"))
-				.attr("y2",centerPlace(data[indexOfMin],"y"));
+				drawLine(data[oldNodeIndex], data[indexOfMin], "yellow");
 
+				// if all nodes are connected, return data
 				if (data.every(function (d){return d.connected == true})){
 					console.log(data);
 					return data;
 				} else {
-					// console.log(data.filter(function (d){return d.connected == false}).length);
 					// recurse!
 					findMST(data, true);
 				}
 			}
 		}
 
-
-
-		// console.log(Math.min.apply(null, csv[0].dists));
 		newData = findMST(csv, false);
 		console.log(newData);
-
+		// WHY IS IT UNDEFINED
 
 
 		// make the circles, give them csv as data
@@ -158,9 +160,24 @@
 		var circleAttributes = circles
 		.style("stroke", "gray")
 		.style("fill", "yellow")
-		.attr("r", 5)
+		.attr("r", 7)
 		.attr("cx", function (d){return centerPlace(d, "x")})
-		.attr("cy", function (d){return centerPlace(d, "y")});
+		.attr("cy", function (d){return centerPlace(d, "y")})
+		.on("click", function (d){
+			if (d.clicked == true){
+				d3.select(this).style("fill", "yellow");
+				d.clicked = false;
+			} else {
+				d3.select(this).style("fill", "red");
+				d.clicked = true;
+			}
+			var clickedCircles = circles.data().filter(function(data){return data.clicked == true;});
+			if (clickedCircles.length == 2){
+				drawLine(clickedCircles[0], clickedCircles[1], "red");
+				circles.data().forEach(function(entry){entry.clicked = false;});
+				console.log(circles.data());
+			}
+		});
 
 		// make the labels, give them csv as data
 		var labels = svg.selectAll("text")
@@ -170,21 +187,11 @@
 
 		// style and position and text
 		var labelAttributes = labels
-		.style("font-size", 10)
+		.style("font-size", 8)
+		.style("fill","white")
 		.attr("x", function (d){return centerPlace(d, "x")})
 		.attr("y", function (d){return centerPlace(d, "y")})
 		.text(function (d){return d["City"]});
-
-		// // same shit for edges
-		// var edges = svg.selectAll("line")
-		// .data(newData)
-		// .enter()
-		// .append("line");
-
-		// // more of the same shit
-		// var edgeAttributes = edges
-		// .style("stroke", "gray")
-		// .style("stroke-width", 2);
 
 	});
 

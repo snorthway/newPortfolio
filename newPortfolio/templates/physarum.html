@@ -8,84 +8,9 @@
 
 {% block extrajs %}
 <script src="{{ url_for('static', filename='js/d3.v3.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/gba_utils.js') }}"></script>
 <script type="text/javascript">
-//Ugly code, completely written between 8PM on Dec. 18 and 5AM on Dec 19
-
-	// sum varz
-	var w=960, h=900;
-	var zx=w*(3/5), zy=h/2;
-	var scale = 750;
-	var big = 1000;
-
-	// so I don't have to type this a billion times
-	function centerPlace(d, axis){
-		if (axis == "x"){
-			return zx + scale*d["Long diff"];
-		} else if (axis == "y"){
-			return zy + scale*d["Lat diff"];
-		}
-	}
-
-	function drawLine(loc1, loc2, color){
-		svg.append("line")
-		.style("stroke-width", 2)
-		.style("stroke", color)
-		.attr("x1",centerPlace(loc1,"x"))
-		.attr("y1",centerPlace(loc1,"y"))
-		.attr("x2",centerPlace(loc2,"x"))
-		.attr("y2",centerPlace(loc2,"y"));
-	}
-
-	function roadCenter(d, axis){
-		if (axis == "x"){
-			return zx + scale*d.long_diff - 7;
-		} else if (axis == "y"){
-			return zy + scale*d.lat_diff - 7;
-		}
-	}
-
-	function drawRoad(loc1, loc2, color){
-		svg.append("line")
-		.style("stroke-width", 2)
-		.style("stroke", color)
-		.attr("x1", roadCenter(loc1, "x")+7)
-		.attr("x2", roadCenter(loc2, "x")+7)
-		.attr("y1", roadCenter(loc1, "y")+7)
-		.attr("y2", roadCenter(loc2, "y")+7);
-	}
-
-	// distance function
-	function findDistance(loc1, loc2){
-		return Math.sqrt(Math.pow(loc1["Latitude (N)"]-loc2["Latitude (N)"],2)+Math.pow(loc1["Longitude (W)"]-loc2["Longitude (W)"],2));
-	}
-
-	// make the distance matrix as a basis for finding MST
-	function findDistanceMatrix(csv){
-		var distanceMatrix = []
-		for (var i=0; i<csv.length; i++){
-			distanceMatrix.push([]);
-			c1 = csv[i]
-			for (var j=0; j<csv.length; j++){
-				c2 = csv[j]
-				hyp = findDistance(c1, c2);
-				if (hyp == 0){
-					distanceMatrix[i].push(big);
-				} else{
-					distanceMatrix[i].push(hyp);
-				}	
-			}
-		}
-		return distanceMatrix;
-	}
-
-	// make the svg element
-	svg=d3.select("#map")
-	.append("svg")
-	.attr("width",w)
-	.attr("height",h)
-	.style("background-color", "white");
-
-	// petri dish photo
+	// petri dish photo, for funzies
 	svg.append("svg:image")
 	.attr("xlink:href", "{{ url_for('static', filename='other/petri_light_bw.JPG')}}")
 	.attr("x",150)
@@ -93,268 +18,147 @@
 	.attr("height", 660)
 	.attr("width", 660);
 
-	// Deal with city csv
-	d3.csv("{{ url_for('static', filename='other/gba_pop.csv')}}", function(csv){
+	var csv_url = "{{ url_for('static', filename='other/gba_pop_revised.csv')}}";
+</script>
+<script src="{{ url_for('static', filename='js/gba_cities.js') }}"></script>
+<script type="text/javascript">
+//Ugly code, completely written between 8PM on Dec. 18 and 5AM on Dec 19
+//Previous comment is no longer true, except for the ugly part. Ewwww
 
-		var distanceMatrixCities = findDistanceMatrix(csv);
+	// // Deal with road csv
+	// d3.csv("{{ url_for('static', filename='other/road_nodes.csv')}}", function(roadCSV){
 
-		// append the data to csv info
-		for (var i=0; i<csv.length; i++){
-			csv[i].dists = distanceMatrixCities[i];
-			csv[i].connected = false;
-			csv[i].clicked = false;
-		}
-		csv.connections = []
+	// 	var distanceMatrixRoads = findDistanceMatrix(roadCSV);
+	// 	// console.log(distanceMatrixRoads);
 
-		// find the minimum spanning tree
-		var cityNetworkLength;
-		function findMST(data, r){
-			if (r == false){
-				cityNetworkLength = Math.min.apply(null, data[0].dists);
-				var indexOfMin = data[0].dists.indexOf(Math.min.apply(null, data[0].dists));
-				data.connections.push([0,indexOfMin]);
-				data[0].connected = true;
-				data[0].dists[indexOfMin] = big;
-				data[indexOfMin].connected = true;
-				data[indexOfMin].dists[0] = big;
+	// 	// append the data to roadCSV info
+	// 	for (var i=0; i<roadCSV.length; i++){
+	// 		roadCSV[i].dists = distanceMatrixRoads[i];
+	// 		roadCSV[i].connected = false;
+	// 		roadCSV[i].clicked = false;
+	// 	}
+	// 	roadCSV.connections = [];
+	// 	// console.log(roadCSV);
+	// 	// console.log(roadCSV[0].dists);
 
-				// draw lines here because I suck
-				drawLine(data[0], data[indexOfMin], "yellow");
+	// 	// find the minimum spanning tree
+	// 	var roadNetworkLength;
+	// 	function findMST(data, r){
+	// 		if (r == false){
+	// 			roadNetworkLength = Math.min.apply(null, data[0].dists);
+	// 			var indexOfMin = data[0].dists.indexOf(Math.min.apply(null, data[0].dists));
+	// 			data.connections.push([0,indexOfMin]);
+	// 			data[0].connected = true;
+	// 			data[0].dists[indexOfMin] = big;
+	// 			data[indexOfMin].connected = true;
+	// 			data[indexOfMin].dists[0] = big;
 
-				// recurse!
-				findMST(data, true);
-			} else {
-				var conNodes = data.filter(function (d){return d.connected == true});
-				// initialize to something that will error
-				var indexOfMin = -1;
-				var conNodeIndex = -1;
-				for (i=0;i<conNodes.length;i++){
-					if (i==0){
-						var conNodeMin = Math.min.apply(null, conNodes[i].dists);
-						indexOfMin = conNodes[i].dists.indexOf(conNodeMin);
-						conNodeIndex = i;
-					} else {
-						newConNodeMin = Math.min.apply(null, conNodes[i].dists);
-						var newIndex = conNodes[i].dists.indexOf(newConNodeMin);
-						if (newConNodeMin < conNodeMin){
-							conNodeMin = newConNodeMin;
-							indexOfMin = newIndex;
-							conNodeIndex = i;
-						}
-					}
+	// 			// draw lines here because I suck
+	// 			drawRoad(data[0], data[indexOfMin], "green");
+
+	// 			// recurse!
+	// 			findMST(data, true);
+	// 		} else {
+	// 			var conNodes = data.filter(function (d){return d.connected == true});
+	// 			// initialize to something that will error
+	// 			var indexOfMin = -1;
+	// 			var conNodeIndex = -1;
+	// 			for (i=0;i<conNodes.length;i++){
+	// 				if (i==0){
+	// 					var conNodeMin = Math.min.apply(null, conNodes[i].dists);
+	// 					indexOfMin = conNodes[i].dists.indexOf(conNodeMin);
+	// 					conNodeIndex = i;
+	// 				} else {
+	// 					newConNodeMin = Math.min.apply(null, conNodes[i].dists);
+	// 					var newIndex = conNodes[i].dists.indexOf(newConNodeMin);
+	// 					if (newConNodeMin < conNodeMin){
+	// 						conNodeMin = newConNodeMin;
+	// 						indexOfMin = newIndex;
+	// 						conNodeIndex = i;
+	// 					}
+	// 				}
 					
-				}
-				cityNetworkLength += conNodeMin;
-				var oldNodeIndex = data.indexOf(conNodes[conNodeIndex]);
-				data.connections.push([oldNodeIndex, indexOfMin]);
-				data[oldNodeIndex].dists[indexOfMin] = big;
-				data[indexOfMin].connected = true;
-				data[indexOfMin].dists[oldNodeIndex] = big;
+	// 			}
+	// 			roadNetworkLength += conNodeMin;
+	// 			var oldNodeIndex = data.indexOf(conNodes[conNodeIndex]);
+	// 			// if (conNodes.length == 15){console.log(oldNodeIndex);}
+	// 			data.connections.push([oldNodeIndex, indexOfMin]);
+	// 			data[oldNodeIndex].dists[indexOfMin] = big;
+	// 			data[indexOfMin].connected = true;
+	// 			data[indexOfMin].dists[oldNodeIndex] = big;
 
-				data.forEach(function(entry){
-					if (entry.connected == true){
-						for (i=0;i<data.length;i++){
-							if (data[i].connected == true){
-								entry.dists[i] = big;
-							}
-						}
-					}
-				});
+	// 			data.forEach(function(entry){
+	// 				if (entry.connected == true){
+	// 					for (i=0;i<data.length;i++){
+	// 						if (data[i].connected == true){
+	// 							entry.dists[i] = big;
+	// 						}
+	// 					}
+	// 				}
+	// 			});
 
-				// draw lines here because I suck
-				drawLine(data[oldNodeIndex], data[indexOfMin], "yellow");
+	// 			// draw lines here because I suck
+	// 			drawRoad(data[oldNodeIndex], data[indexOfMin], "green");
 
-				// if all nodes are connected, return data
-				if (data.every(function (d){return d.connected == true})){
-					// console.log(data);
-					console.log("cities", cityNetworkLength);
-					return data;
-				} else {
-					// recurse!
-					findMST(data, true);
-				}
-			}
-		}
+	// 			// if all nodes are connected, return data
+	// 			if (data.every(function (d){return d.connected == true})){
+	// 				console.log("roads", roadNetworkLength);
+	// 				return data;
+	// 			} else {
+	// 				// recurse!
+	// 				findMST(data, true);
+	// 			}
+	// 		}
+	// 	}
 
-		newData = findMST(csv, false);
-		// WHY IS IT UNDEFINED
-
-
-		// make the circles, give them csv as data
-		var townNodes = svg.selectAll("circle")
-		.data(csv)
-		.enter()
-		.append("circle");
-
-		//style and position
-		var circleAttributes = townNodes
-		.style("stroke", "gray")
-		.style("fill", "yellow")
-		.attr("r", 7)
-		.attr("cx", function (d){return centerPlace(d, "x")})
-		.attr("cy", function (d){return centerPlace(d, "y")})
-		.on("click", function (d){
-			if (d.clicked == true){
-				d3.select(this).style("fill", "yellow");
-				d.clicked = false;
-			} else {
-				d3.select(this).style("fill", "red");
-				d.clicked = true;
-			}
-			var clickedTowns = townNodes.data().filter(function(data){return data.clicked == true;});
-			if (clickedTowns.length == 2){
-				drawLine(clickedTowns[0], clickedTowns[1], "red");
-				townNodes.data().forEach(function(entry){entry.clicked = false;});
-				// console.log(townNodes.data());
-			}
-		});
-
-		// make the labels, give them csv as data
-		var labels = svg.selectAll("text")
-		.data(csv)
-		.enter()
-		.append("text");
-
-		// style and position and text
-		var labelAttributes = labels
-		.style("font-size", "10px")
-		.style("fill","white")
-		.attr("x", function (d){return centerPlace(d, "x")})
-		.attr("y", function (d){return centerPlace(d, "y")})
-		.text(function (d){return d["City"]});
-
-	});
-
-	// Deal with road csv
-	d3.csv("{{ url_for('static', filename='other/road_nodes.csv')}}", function(roadCSV){
-
-		var distanceMatrixRoads = findDistanceMatrix(roadCSV);
-		// console.log(distanceMatrixRoads);
-
-		// append the data to roadCSV info
-		for (var i=0; i<roadCSV.length; i++){
-			roadCSV[i].dists = distanceMatrixRoads[i];
-			roadCSV[i].connected = false;
-			roadCSV[i].clicked = false;
-		}
-		roadCSV.connections = [];
-		// console.log(roadCSV);
-		// console.log(roadCSV[0].dists);
-
-		// find the minimum spanning tree
-		var roadNetworkLength;
-		function findMST(data, r){
-			if (r == false){
-				roadNetworkLength = Math.min.apply(null, data[0].dists);
-				var indexOfMin = data[0].dists.indexOf(Math.min.apply(null, data[0].dists));
-				data.connections.push([0,indexOfMin]);
-				data[0].connected = true;
-				data[0].dists[indexOfMin] = big;
-				data[indexOfMin].connected = true;
-				data[indexOfMin].dists[0] = big;
-
-				// draw lines here because I suck
-				drawRoad(data[0], data[indexOfMin], "green");
-
-				// recurse!
-				findMST(data, true);
-			} else {
-				var conNodes = data.filter(function (d){return d.connected == true});
-				// initialize to something that will error
-				var indexOfMin = -1;
-				var conNodeIndex = -1;
-				for (i=0;i<conNodes.length;i++){
-					if (i==0){
-						var conNodeMin = Math.min.apply(null, conNodes[i].dists);
-						indexOfMin = conNodes[i].dists.indexOf(conNodeMin);
-						conNodeIndex = i;
-					} else {
-						newConNodeMin = Math.min.apply(null, conNodes[i].dists);
-						var newIndex = conNodes[i].dists.indexOf(newConNodeMin);
-						if (newConNodeMin < conNodeMin){
-							conNodeMin = newConNodeMin;
-							indexOfMin = newIndex;
-							conNodeIndex = i;
-						}
-					}
-					
-				}
-				roadNetworkLength += conNodeMin;
-				var oldNodeIndex = data.indexOf(conNodes[conNodeIndex]);
-				// if (conNodes.length == 15){console.log(oldNodeIndex);}
-				data.connections.push([oldNodeIndex, indexOfMin]);
-				data[oldNodeIndex].dists[indexOfMin] = big;
-				data[indexOfMin].connected = true;
-				data[indexOfMin].dists[oldNodeIndex] = big;
-
-				data.forEach(function(entry){
-					if (entry.connected == true){
-						for (i=0;i<data.length;i++){
-							if (data[i].connected == true){
-								entry.dists[i] = big;
-							}
-						}
-					}
-				});
-
-				// draw lines here because I suck
-				drawRoad(data[oldNodeIndex], data[indexOfMin], "green");
-
-				// if all nodes are connected, return data
-				if (data.every(function (d){return d.connected == true})){
-					console.log("roads", roadNetworkLength);
-					return data;
-				} else {
-					// recurse!
-					findMST(data, true);
-				}
-			}
-		}
-
-		findMST(roadCSV, false);
+	// 	findMST(roadCSV, false);
 
 
-		var roadNodes = svg.selectAll("rect")
-		.data(roadCSV)
-		.enter()
-		.append("rect")
+	// 	var roadNodes = svg.selectAll("rect")
+	// 	.data(roadCSV)
+	// 	.enter()
+	// 	.append("rect")
 
-		var roadNodeAttributes = roadNodes
-		.style("stroke", "gray")
-		.style("fill", "green")
-		.attr("width", 14)
-		.attr("height", 14)
-		.attr("x", function (d){return roadCenter(d, "x");})
-		.attr("y", function (d){return roadCenter(d, "y");})
-		.on("click", function (d){
-			if (d.clicked == true){
-				d3.select(this).style("fill", "green");
-				d.clicked = false;
-			} else {
-				d3.select(this).style("fill", "red");
-				d.clicked = true;
-			}
-			var clickedRoads = roadNodes.data().filter(function(data){return data.clicked == true;});
-			if (clickedRoads.length == 2){
-				drawRoad(clickedRoads[0], clickedRoads[1], "red");
-				roadNodes.data().forEach(function(entry){entry.clicked = false;});
-			}
-		});
+	// 	var drawnRoadLength = 0;
 
-		// make the labels, give them csv as data
-		var roadLabels = svg.selectAll("text")
-		.data(roadCSV)
-		.enter()
-		.append("text");
+	// 	var roadNodeAttributes = roadNodes
+	// 	.style("stroke", "gray")
+	// 	.style("fill", "green")
+	// 	.attr("width", 14)
+	// 	.attr("height", 14)
+	// 	.attr("x", function (d){return roadCenter(d, "x");})
+	// 	.attr("y", function (d){return roadCenter(d, "y");})
+	// 	.on("click", function (d){
+	// 		if (d.clicked == true){
+	// 			d3.select(this).style("fill", "green");
+	// 			d.clicked = false;
+	// 		} else {
+	// 			d3.select(this).style("fill", "red");
+	// 			d.clicked = true;
+	// 		}
+	// 		var clickedRoads = roadNodes.data().filter(function(data){return data.clicked == true;});
+	// 		if (clickedRoads.length == 2){
+	// 			drawRoad(clickedRoads[0], clickedRoads[1], "red");
+	// 			roadNodes.data().forEach(function(entry){entry.clicked = false;});
+	// 			drawnRoadLength += findDistance(clickedRoads[0], clickedRoads[1]);
+	// 			console.log("total length: ",drawnRoadLength);
+	// 		}
+	// 	});
 
-		// style and position and text
-		var roadLabelAttributes = roadLabels
-		.style("font-size", "10px")
-		.style("fill","red")
-		.attr("x", function (d){return roadCenter(d, "x");})
-		.attr("y", function (d){return roadCenter(d, "y");})
-		.text(function (d){return d["Longitude (W)"]});
-	});
+	// 	// make the labels, give them csv as data
+	// 	var roadLabels = svg.selectAll("text")
+	// 	.data(roadCSV)
+	// 	.enter()
+	// 	.append("text");
+
+	// 	// style and position and text
+	// 	var roadLabelAttributes = roadLabels
+	// 	.style("font-size", "10px")
+	// 	.style("fill","red")
+	// 	.attr("x", function (d){return roadCenter(d, "x");})
+	// 	.attr("y", function (d){return roadCenter(d, "y");})
+	// 	.text(function (d){return d["Longitude (W)"]});
+	// });
 	
 
 

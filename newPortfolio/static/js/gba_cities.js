@@ -1,5 +1,11 @@
 d3.csv(csv_url, function(csv){
 
+	// make numbers slightly easier to deal with
+	for (var i=0; i<csv.length; i++){
+		csv[i].latitude = Math.round(csv[i].latitude*100)/100;
+		csv[i].longitude = Math.round(csv[i].longitude*100)/100;
+	}
+
 	var distanceMatrixCities = findDistanceMatrix(csv);
 
     // append the data to csv info
@@ -7,6 +13,8 @@ d3.csv(csv_url, function(csv){
             csv[i].dists = distanceMatrixCities[i];
             csv[i].connected = false;
             csv[i].clicked = false;
+            csv[i].x = centerPlace(csv[i],"x");
+            csv[i].y = centerPlace(csv[i],"y");
     }
     csv.connections = []
 
@@ -55,7 +63,37 @@ d3.csv(csv_url, function(csv){
 	.attr("y", function (d){return centerPlace(d, "y")})
 	.text(function (d){return d["City"]});
 
-	console.log(csv);
 	findMST(csv, false);
 
+	// make a grid of evenly spaced points
+	function makeGrid(){
+		var startX = 149;
+		var startY = 119;
+		var interval = 6;
+		var nodeArray = [];
+		for (var i=0; i<660; i+=interval){
+			for (var j=0; j<660; j+=interval){
+				nodeArray.push({x:startX+i,y:startY+j,city:null});
+			}
+		}
+		return nodeArray;
+	}
+
+	var grid = makeGrid();
+
+	// show grid nodes
+	gridNodes = svg.selectAll("rect")
+	.data(grid)
+	.enter()
+	.append("rect")
+	.attr("x", function (d){return d.x})
+	.attr("y", function (d){return d.y})
+	.attr("width", 2)
+	.attr("height", 2)
+	.style("fill", "green")
+	.style("stroke", "green");
+
+
+
 });
+

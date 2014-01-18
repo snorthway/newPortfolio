@@ -17,6 +17,10 @@ def contact():
 def art():
 	return render_template('art.html')
 
+@app.route('/art/people')
+def people():
+	return render_template('people.html')
+
 @app.route('/engineering')
 def engineering():
 	return render_template('engineering.html')

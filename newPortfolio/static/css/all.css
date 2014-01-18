@@ -1,4 +1,6 @@
 body {
+	font-family: 'Roboto', sans-serif;
+	font-weight: 300;
 	color: #BFB6AA;
 	margin: 0;
 	background-color: #000
@@ -22,10 +24,12 @@ img {
 }
 
 #nav-list > li {
+	font-family: 'Roboto', sans-serif;
+	font-size: 1.3em;
+	font-weight: 400;
 	float: left;
 	list-style-type: none;
 	margin-left: 30px;
-	font-size: 1.3em;
 	margin-top: -20px;
 }
 
@@ -36,4 +40,8 @@ a {
 
 a:hover {
 	color: #666E73;
+}
+
+.center {
+	text-align: center;
 }

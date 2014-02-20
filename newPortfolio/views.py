@@ -21,6 +21,11 @@ def art():
 def people():
 	return render_template('people.html')
 
+@app.route('/blog')
+@app.route('/blog/<title>')
+def blog(title=None):
+	return render_template('blog.html', title=title)
+
 @app.route('/engineering')
 def engineering():
 	return render_template('engineering.html')
@@ -32,3 +37,7 @@ def resume():
 @app.route('/physarum')
 def physarum():
 	return render_template('physarum.html')
+
+@app.route('/productivity')
+def productivity():
+	return render_template('productivity.html')

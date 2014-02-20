@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block navbar %}
+{% include 'navbar.html' %}
+{% endblock %}
+
+{% block extrahead %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/atelier-seaside.light.css')}}">
+	<script type="text/javascript" src="{{ url_for('static', filename='js/highlight.pack.js') }}"></script>
+	<script type="text/javascript">hljs.initHighlightingOnLoad();</script>
+{% endblock %}
+
+{% block content %}
+	{% if title %}
+		<p>Why did you put a title in the URL? That feature isn't even a thing yet.</p>
+	{% else %}
+		<div class="container fourteen columns">
+			<h2>Deconstructing My Bad Javascript For The Greater Good</h2>
+			<h4><i>February 20, 2014</i></h4>
+			<p>This is primarily for my own learning, and I will try to make it coherent such that others can learn from it too.</p>
+			<p>Let's start with the simple things:</p>
+			<pre class="prettyprint">
+			<code>
+// width and height of svg element
+var w=960, h=900;
+// uhh
+var zx=w*(3/5), zy=h/2;
+// for scaling the distance between nodes
+var scale = 750;
+// arbitrarily large number to assign connected nodes (when finding MST)
+var big = 1000;
+// used in MST function
+var cityNetworkLength;
+			</code>
+			</pre>
+			<p>What the hell is a "var" anyway? I can make variables with or without it.</p>
+		</div>
+	{% endif %}
+{% endblock %}

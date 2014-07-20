@@ -1,9 +1,9 @@
-from newPortfolio import app, db_util
-from flask import render_template
 import os
+import pandas as pd
 
-# def aws_url(folder, photo):
-# 	return "https://s3.amazonaws.com/snorthway_portfolio/%s/%s" % (folder, photo)
+from flask import render_template
+
+from newPortfolio import app, db_util
 
 @app.route('/')
 def home():
@@ -16,10 +16,6 @@ def contact():
 @app.route('/art')
 def art():
 	return render_template('art.html')
-
-@app.route('/art/people')
-def people():
-	return render_template('people.html')
 
 @app.route('/blog')
 @app.route('/blog/<title>')
@@ -40,4 +36,26 @@ def physarum():
 
 @app.route('/productivity')
 def productivity():
-	return render_template('productivity.html')
+
+	# Get and read csv
+	csv_file = '/home/snorthway/portfolio/newPortfolio/newPortfolio/static/other/s6.csv'
+	s6 = pd.read_csv(csv_file)
+
+	# Make a new df of the totals for each week (started on a Tuesday, hence the - 5)
+	totals_ix = filter(lambda x: x % 8 - 5 == 0, range(len(s6.index)))
+	totals = s6.iloc[totals_ix]
+	# For totals: index = week
+	totals.index = map(lambda x: x + 1, range(len(totals)))
+
+	# Drop 'totals' rows from s6
+	s6 = s6.drop(s6.index[totals_ix])
+	s6.index = range(len(s6.index))
+
+	# Add 'Week' column for sorting
+	s6['Week'] = pd.Series(map(lambda x: (x+2)/7 + 1, range(len(s6.index))))
+
+	# Replace NaNs with zeros
+	totals.fillna(0)
+	s6.fillna(0)
+
+	return render_template('productivity.html', data=s6.to_json())

@@ -21,16 +21,9 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 	.attr("height",h)
 	.style("background-color", "#3A3C42");
 
-	var url = "https://spreadsheets.google.com/feeds/cells/0AhPpLHO-t5J7dG41ZG81Qk4yQjFIRFgxMV9VdmtGSlE/od6/public/basic"
-
-	$.getJSON(url, function (resp){
-		console.log(resp);
-		console.log(typeof resp);
-		console.log('hello');
-	}).fail(function( jqxhr, textStatus, error ) {
-                    var err = textStatus + ', ' + error;
-                    console.log( "Request Failed: " + err);
-              });
+	var pdata = {{data|safe}};
+	console.log(pdata);
 
 </script>
+
 {% endblock %}

@@ -2,6 +2,32 @@
 
 {% block title %}Productivity{% endblock %}
 
+{% block extrahead %}
+<style type="text/css">
+
+	.tick {
+		stroke: #ccc;
+	}
+	
+	text {
+		stroke: #ccc;
+	}
+
+	.axis path, 
+	.axis line {
+		fill: none;
+		stroke: #ccc;
+		shape-rendering: crispEdges;
+	}
+
+	.x.axis path,
+	.x.axis line {
+		display: none;
+	}
+
+</style>
+{% endblock %}
+
 {% block content %}
 	<div id="map"></div>
 {% endblock %}
@@ -11,19 +37,106 @@
 src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 <script src="{{ url_for('static', filename='js/d3.v3.min.js') }}"></script>
 <script type="text/javascript">
+
+	// margins
+	var margin = {top: 30, right: 80, bottom: 30, left: 40}
 	// width and height
-	var w=960, h=900;
+	var width = 960 - margin.left - margin.right; 
+	var height = 600 - margin.top - margin.bottom;
+
+	// x and y
+	var x = d3.scale.ordinal()
+		.rangeRoundBands([0, width], .2);
+	var y = d3.scale.linear()
+		.rangeRound([height, 0]);
+
+	// Axes
+	var xAxis = d3.svg.axis()
+		.scale(x)
+		.orient("bottom");
+	var yAxis = d3.svg.axis()
+		.scale(y)
+		.orient("left");
+
+	// datums
+	var s6 = {{s6|safe}};
+	var totals = {{totals|safe}};
+	console.log(s6);
+	console.log(totals);
 
 	// make the svg element
-	svg=d3.select("#map")
+	svg = d3.select("#map")
 	.append("svg")
-	.attr("width",w)
-	.attr("height",h)
-	.style("background-color", "#3A3C42");
+	.attr("width", width + margin.left + margin.right)
+	.attr("height", height + margin.top + margin.bottom)
+	.style("background-color", "#3A3C42")
+	.append("g")
+	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-	var pdata = {{data|safe}};
-	console.log(pdata);
+	// Make the color mapping
+	var color = d3.scale.ordinal()
+		.range(["#685C79", "#FF6138", "#EFF1C2", "#DA727E", "#FFFF9D", "#BEEB9F", "#455C7B", "#79BD8F", "#00A388", "#1E9382", "#70A758", "#F0563D", "#FFAA5C", "#AC6C82"]) // 14 colors
+		.domain(d3.keys(totals[1]).filter(function(key) { return key !== "Total"; }));
 
+	// set x and y domains
+	tvals = [];
+
+
+	for (var week in totals) {
+		var y0 = 0;
+		totals[week].activities = color.domain().map(function(name){
+			var ret = {name: name, y0: y0, y1: y0 + totals[week][name]}
+			y0 = y0 + totals[week][name]
+			return ret
+		});
+		for (var activity in totals[week]) {
+			tvals.push(totals[week][activity]);
+		}
+	}
+
+	x.domain(Object.keys(totals));
+	y.domain([0, d3.max(tvals)]);
+
+	// make svg groups for x and y axes
+	svg.append("g")
+		.attr("class", "x axis")
+		.attr("transform", "translate(0, " + height + ")")
+		.call(xAxis);
+
+	svg.append("g")
+		.attr("class", "y axis")
+		.call(yAxis)
+		.append("text")
+			.attr("transform", "rotate(-90)")
+			.attr("y", 6)
+			.attr("dy", ".71em")
+			.style("text-anchor", "end")
+			.text("Hours");
+
+	newtotals = $.map(totals, function(value, index) { 
+		value.Week = index;
+		return value
+	})
+
+	var week = svg.selectAll(".week")
+		.data(newtotals)
+		.enter().append("g")
+		.attr("class", "g")
+		.attr("transform", function(d){return "translate(" + x(d.Week) +", 0)"; });
+
+	console.log(week)
+
+	week.selectAll("rect")
+		.data(function(d) { return d.activities; })
+		.enter().append("rect")
+		.attr("width", x.rangeBand())
+		.attr("y", function(d) {return y(d.y1); })
+		.attr("height", function(d) { return y(d.y0) - y(d.y1); })
+		.style("fill", function(d) {return color(d.name); })
+
+
+
+	
 </script>
 
 {% endblock %}

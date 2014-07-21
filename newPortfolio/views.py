@@ -55,7 +55,8 @@ def productivity():
 	s6['Week'] = pd.Series(map(lambda x: (x+2)/7 + 1, range(len(s6.index))))
 
 	# Replace NaNs with zeros
-	totals.fillna(0)
-	s6.fillna(0)
+	totals = totals.fillna(0).drop('Unnamed: 0', axis=1).drop('Unnamed: 1', axis=1)
+	totals = totals.T
+	s6 = s6.fillna(0).rename(columns={'Unnamed: 0': 'Day', 'Unnamed: 1': 'Date'})
 
-	return render_template('productivity.html', data=s6.to_json())
+	return render_template('productivity.html', s6=s6.to_json(), totals=totals.to_json())

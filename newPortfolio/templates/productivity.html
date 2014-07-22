@@ -5,12 +5,14 @@
 {% block extrahead %}
 <style type="text/css">
 
-	.tick {
-		stroke: #ccc;
+	.title {
+		font-size: 18;
+		font-weight: 400; 
 	}
-	
+
+	.tick, 
 	text {
-		stroke: #ccc;
+		fill: #ccc;
 	}
 
 	.axis path, 
@@ -23,6 +25,10 @@
 	.x.axis path,
 	.x.axis line {
 		display: none;
+	}
+
+	g.legend {
+		z-index: 100;
 	}
 
 </style>
@@ -38,8 +44,38 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 <script src="{{ url_for('static', filename='js/d3.v3.min.js') }}"></script>
 <script type="text/javascript">
 
+	//utilities
+
+	var mouseoverStyle = {
+		stroke: "#ccc",
+		"stroke-width": 2,
+		"z-index": 300
+	}
+
+	var mouseOutStyle = {
+		stroke: "none",
+		"z-index": 100
+	}
+
+	// var maskDefaultStyle = {
+	// 	"background-color": "#3A3C42",
+	// 	opacity: 0,
+	// 	"z-index": 0
+	// }
+
+	// var maskActiveStyle = {
+	// 	opacity: 0.5,
+	// 	"z-index": 200
+	// }
+
+	function convertToClass(d) {
+		return d.toLowerCase().replace(/ /g, "-");
+	}
+
+	// many thanks to http://bl.ocks.org/mbostock/3886208
+
 	// margins
-	var margin = {top: 30, right: 80, bottom: 30, left: 40}
+	var margin = {top: 45, right: 140, bottom: 60, left: 40}
 	// width and height
 	var width = 960 - margin.left - margin.right; 
 	var height = 600 - margin.top - margin.bottom;
@@ -75,7 +111,7 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 
 	// Make the color mapping
 	var color = d3.scale.ordinal()
-		.range(["#685C79", "#FF6138", "#EFF1C2", "#DA727E", "#FFFF9D", "#BEEB9F", "#455C7B", "#79BD8F", "#00A388", "#1E9382", "#70A758", "#F0563D", "#FFAA5C", "#AC6C82"]) // 14 colors
+		.range(["#685C79", "#FF6138", "#EFF1C2", "#DA727E", "#FFFF5C", "#BEEB9F", "#455C7B", "#79BD8F", "#00A388", "#FFAA5C", "#70A758", "#F0563D", "#1E9382", "#AC6C82"]) // 14 colors
 		.domain(d3.keys(totals[1]).filter(function(key) { return key !== "Total"; }));
 
 	// set x and y domains
@@ -97,11 +133,22 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 	x.domain(Object.keys(totals));
 	y.domain([0, d3.max(tvals)]);
 
-	// make svg groups for x and y axes
+	// make svg groups for title and x and y axes
+	svg.append("g")
+		.attr("class", "title")
+		.append("text")
+			.attr("transform", "translate(" + width/2 + "," + (25-margin.top) + ")")
+			.attr("text-anchor", "middle")
+			.text("Semester 6: Work Hours Outside of Class");
+
 	svg.append("g")
 		.attr("class", "x axis")
 		.attr("transform", "translate(0, " + height + ")")
-		.call(xAxis);
+		.call(xAxis)
+		.append("text")
+			.attr("transform", "translate(" + width/2 + "," + (margin.bottom - 15) + ")")
+			.attr("text-anchor", "middle")
+			.text("Week")
 
 	svg.append("g")
 		.attr("class", "y axis")
@@ -118,21 +165,59 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 		return value
 	})
 
+	// var mask = svg.selectAll(".mask")
+	// 	.data([0])
+	// 	.enter().append("g")
+	// 		.attr("class", "mask")
+
+	// mask.append("rect")
+	// 	.attr("x", 0)
+	// 	.attr("y", 0)
+	// 	.attr("width", width + margin.left + margin.right)
+	// 	.attr("height", height + margin.top + margin.bottom)
+	// 	.style(maskDefaultStyle);
+
 	var week = svg.selectAll(".week")
 		.data(newtotals)
 		.enter().append("g")
-		.attr("class", "g")
-		.attr("transform", function(d){return "translate(" + x(d.Week) +", 0)"; });
-
-	console.log(week)
+			.attr("class", "g")
+			.attr("transform", function(d){return "translate(" + x(d.Week) +", 0)"; });
 
 	week.selectAll("rect")
 		.data(function(d) { return d.activities; })
 		.enter().append("rect")
-		.attr("width", x.rangeBand())
-		.attr("y", function(d) {return y(d.y1); })
-		.attr("height", function(d) { return y(d.y0) - y(d.y1); })
-		.style("fill", function(d) {return color(d.name); })
+			.attr("class", function(d) { return convertToClass(d.name); })
+			.attr("width", x.rangeBand())
+			.attr("y", function(d) {return y(d.y1); })
+			.attr("height", function(d) { return y(d.y0) - y(d.y1); })
+			.style("fill", function(d) {return color(d.name); })
+
+
+	var legend = svg.selectAll(".legend")
+		.data(color.domain().slice().reverse())
+		.enter().append("g")
+			.attr("class", "legend")
+			.attr("transform", function(d, i) {return "translate(0, " + i*20 + ")"});
+
+	legend.append("rect")
+		.attr("class", function(d) { return convertToClass(d); })
+		.attr("x", width + margin.right - 28)
+		.attr("width", 18)
+		.attr("height", 18)
+		.style("fill", color)
+		.on("mouseover", function(d) {$("."+convertToClass(d)).css(mouseoverStyle);})
+		.on("mouseout", function(d) {$("."+convertToClass(d)).css(mouseOutStyle)});
+
+	legend.append("text")
+		.attr("class", function(d) { return convertToClass(d); })
+		.attr("x", width + margin.right - 34)
+		.attr("y", 9)
+		.attr("dy", ".35em")
+		.style("text-anchor", "end")
+		.text(function(d) {return d;});
+
+
+	
 
 
 

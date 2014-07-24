@@ -1,5 +1,5 @@
 import os
-import pandas as pd
+# import pandas as pd
 
 from flask import render_template
 
@@ -34,29 +34,29 @@ def resume():
 def physarum():
 	return render_template('physarum.html')
 
-@app.route('/productivity')
-def productivity():
+# @app.route('/productivity')
+# def productivity():
 
 	# Get and read csv
-	csv_file = '/home/snorthway/portfolio/newPortfolio/newPortfolio/static/other/s6.csv'
-	s6 = pd.read_csv(csv_file)
+	# csv_file = '/home/snorthway/portfolio/newPortfolio/newPortfolio/static/other/s6.csv'
+	# s6 = pd.read_csv(csv_file)
 
-	# Make a new df of the totals for each week (started on a Tuesday, hence the - 5)
-	totals_ix = filter(lambda x: x % 8 - 5 == 0, range(len(s6.index)))
-	totals = s6.iloc[totals_ix]
-	# For totals: index = week
-	totals.index = map(lambda x: x + 1, range(len(totals)))
+	# # Make a new df of the totals for each week (started on a Tuesday, hence the - 5)
+	# totals_ix = filter(lambda x: x % 8 - 5 == 0, range(len(s6.index)))
+	# totals = s6.iloc[totals_ix]
+	# # For totals: index = week
+	# totals.index = map(lambda x: x + 1, range(len(totals)))
 
-	# Drop 'totals' rows from s6
-	s6 = s6.drop(s6.index[totals_ix])
-	s6.index = range(len(s6.index))
+	# # Drop 'totals' rows from s6
+	# s6 = s6.drop(s6.index[totals_ix])
+	# s6.index = range(len(s6.index))
 
-	# Add 'Week' column for sorting
-	s6['Week'] = pd.Series(map(lambda x: (x+2)/7 + 1, range(len(s6.index))))
+	# # Add 'Week' column for sorting
+	# s6['Week'] = pd.Series(map(lambda x: (x+2)/7 + 1, range(len(s6.index))))
 
-	# Replace NaNs with zeros
-	totals = totals.fillna(0).drop('Unnamed: 0', axis=1).drop('Unnamed: 1', axis=1)
-	totals = totals.T
-	s6 = s6.fillna(0).rename(columns={'Unnamed: 0': 'Day', 'Unnamed: 1': 'Date'})
+	# # Replace NaNs with zeros
+	# totals = totals.fillna(0).drop('Unnamed: 0', axis=1).drop('Unnamed: 1', axis=1)
+	# totals = totals.T
+	# s6 = s6.fillna(0).rename(columns={'Unnamed: 0': 'Day', 'Unnamed: 1': 'Date'})
 
-	return render_template('productivity.html', s6=s6.to_json(), totals=totals.to_json())
+	# return render_template('productivity.html', s6=s6.to_json(), totals=totals.to_json())

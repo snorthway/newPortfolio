@@ -5,10 +5,6 @@
 {% block extrahead %}
 <style type="text/css">
 
-	.title {
-		font-size: 18;
-		font-weight: 400; 
-	}
 
 	.tick, 
 	text {
@@ -57,17 +53,6 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 		"z-index": 100
 	}
 
-	// var maskDefaultStyle = {
-	// 	"background-color": "#3A3C42",
-	// 	opacity: 0,
-	// 	"z-index": 0
-	// }
-
-	// var maskActiveStyle = {
-	// 	opacity: 0.5,
-	// 	"z-index": 200
-	// }
-
 	function convertToClass(d) {
 		return d.toLowerCase().replace(/ /g, "-");
 	}
@@ -79,6 +64,26 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 	// width and height
 	var width = 960 - margin.left - margin.right; 
 	var height = 600 - margin.top - margin.bottom;
+
+	// datums
+	var s6 = {{s6|safe}};
+	var totals = {{totals|safe}};
+	console.log(s6);
+	console.log(totals);
+
+	// Make the color mapping
+	var color = d3.scale.ordinal()
+		.range(["#685C79", "#FF6138", "#EFF1C2", "#DA727E", "#FFFF5C", "#BEEB9F", "#455C7B", "#79BD8F", "#00A388", "#FFAA5C", "#70A758", "#F0563D", "#1E9382", "#AC6C82"]) // 14 colors
+		.domain(d3.keys(totals[1]).filter(function(key) { return key !== "Total"; }));
+
+	// make the svg element
+	var svg = d3.select("#map")
+	.append("svg")
+	.attr("width", width + margin.left + margin.right)
+	.attr("height", height + margin.top + margin.bottom)
+	.style("background-color", "#3A3C42")
+	.append("g")
+	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 	// x and y
 	var x = d3.scale.ordinal()
@@ -94,133 +99,238 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 		.scale(y)
 		.orient("left");
 
-	// datums
-	var s6 = {{s6|safe}};
-	var totals = {{totals|safe}};
-	console.log(s6);
-	console.log(totals);
+	showYear()
 
-	// make the svg element
-	svg = d3.select("#map")
-	.append("svg")
-	.attr("width", width + margin.left + margin.right)
-	.attr("height", height + margin.top + margin.bottom)
-	.style("background-color", "#3A3C42")
-	.append("g")
-	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	function makeTitle(subtitle) {
 
-	// Make the color mapping
-	var color = d3.scale.ordinal()
-		.range(["#685C79", "#FF6138", "#EFF1C2", "#DA727E", "#FFFF5C", "#BEEB9F", "#455C7B", "#79BD8F", "#00A388", "#FFAA5C", "#70A758", "#F0563D", "#1E9382", "#AC6C82"]) // 14 colors
-		.domain(d3.keys(totals[1]).filter(function(key) { return key !== "Total"; }));
+		svg.append("g")
+			.attr("class", "title")
+			.append("text")
+				.attr("transform", "translate(" + width/2 + "," + (25-margin.top) + ")")
+				.attr("text-anchor", "middle")
+				.attr("font-size", "1.5em")
+				.text("Work Hours Outside of Class");
 
-	// set x and y domains
-	tvals = [];
-
-
-	for (var week in totals) {
-		var y0 = 0;
-		totals[week].activities = color.domain().map(function(name){
-			var ret = {name: name, y0: y0, y1: y0 + totals[week][name]}
-			y0 = y0 + totals[week][name]
-			return ret
-		});
-		for (var activity in totals[week]) {
-			tvals.push(totals[week][activity]);
-		}
+		svg.append("g")
+			.attr("class", "subtitle")
+			.append("text")
+				.attr("transform", "translate(" + width/2 + "," + (50-margin.top) + ")")
+				.attr("text-anchor", "middle")
+				.attr("font-size", "1.25em")
+				.text(subtitle);
 	}
 
-	x.domain(Object.keys(totals));
-	y.domain([0, d3.max(tvals)]);
+	function makeXAxis(label){
+		svg.append("g")
+			.attr("class", "x axis")
+			.attr("transform", "translate(0, " + height + ")")
+			.call(xAxis)
+			.append("text")
+				.attr("transform", "translate(" + width/2 + "," + (margin.bottom - 15) + ")")
+				.attr("text-anchor", "middle")
+				.text(label);
+	}
 
-	// make svg groups for title and x and y axes
-	svg.append("g")
-		.attr("class", "title")
-		.append("text")
-			.attr("transform", "translate(" + width/2 + "," + (25-margin.top) + ")")
-			.attr("text-anchor", "middle")
-			.text("Semester 6: Work Hours Outside of Class");
+	function makeYAxis(){
+		svg.append("g")
+			.attr("class", "y axis")
+			.call(yAxis)
+			.append("text")
+				.attr("transform", "rotate(-90)")
+				.attr("y", 6)
+				.attr("dy", ".71em")
+				.style("text-anchor", "end")
+				.text("Hours");
+	}
 
-	svg.append("g")
-		.attr("class", "x axis")
-		.attr("transform", "translate(0, " + height + ")")
-		.call(xAxis)
-		.append("text")
-			.attr("transform", "translate(" + width/2 + "," + (margin.bottom - 15) + ")")
-			.attr("text-anchor", "middle")
-			.text("Week")
+	function showYear() {
 
-	svg.append("g")
-		.attr("class", "y axis")
-		.call(yAxis)
-		.append("text")
-			.attr("transform", "rotate(-90)")
-			.attr("y", 6)
-			.attr("dy", ".71em")
+		removeG();
+
+		// set x and y domains
+		tvals = [];
+
+		for (var week in totals) {
+			var y0 = 0;
+			totals[week].activities = color.domain().map(function(name){
+				var ret = {name: name, y0: y0, y1: y0 + totals[week][name]}
+				y0 = y0 + totals[week][name]
+				return ret
+			});
+			for (var activity in totals[week]) {
+				tvals.push(totals[week][activity]);
+			}
+		}
+
+		x.domain(Object.keys(totals));
+		y.domain([0, d3.max(tvals)]);
+
+		// make svg groups for title and x and y axes
+		makeTitle("Semester 6");
+		makeXAxis("Week");
+		makeYAxis();
+
+		// contort the data a bit
+		newtotals = $.map(totals, function(value, index) { 
+			value.Week = index;
+			return value
+		});
+		console.log("newtotals", newtotals);
+
+
+		var week = svg.selectAll(".week")
+			.data(newtotals)
+			.enter().append("g")
+				.attr("class", "g")
+				.attr("transform", function(d){return "translate(" + x(d.Week) +", 0)"; })
+				.on("mouseover", function(d){
+					$(this).children().css(mouseoverStyle); 
+					$("g .x.axis > .tick > text").filter(function() {return $(this).html() == d.Week}).css("font-size", "1.5em");
+				})
+				.on("mouseout", function(d){
+					$(this).children().css(mouseOutStyle);
+					$("g .x.axis > .tick > text").css("font-size", "1em");
+				})
+				.on("click", function(d){
+					showWeek(d.Week);
+				});
+
+		week.selectAll("rect")
+			.data(function(d) { return d.activities; })
+			.enter().append("rect")
+				.attr("class", function(d) { return convertToClass(d.name); })
+				.attr("width", x.rangeBand())
+				.attr("y", function(d) {return y(d.y1); })
+				.attr("height", function(d) { return y(d.y0) - y(d.y1); })
+				.style("fill", function(d) {return color(d.name); });
+
+
+		var legend = svg.selectAll(".legend")
+			.data(color.domain().slice().reverse())
+			.enter().append("g")
+				.attr("class", "legend")
+				.attr("transform", function(d, i) {return "translate(0, " + i*20 + ")"});
+
+		legend.append("rect")
+			.attr("class", function(d) { return convertToClass(d); })
+			.attr("x", width + margin.right - 28)
+			.attr("width", 18)
+			.attr("height", 18)
+			.style("fill", color)
+			.on("mouseover", function(d) {$("."+convertToClass(d)).css(mouseoverStyle);})
+			.on("mouseout", function(d) {$("."+convertToClass(d)).css(mouseOutStyle)});
+
+		legend.append("text")
+			.attr("class", function(d) { return convertToClass(d); })
+			.attr("x", width + margin.right - 34)
+			.attr("y", 9)
+			.attr("dy", ".35em")
 			.style("text-anchor", "end")
-			.text("Hours");
+			.text(function(d) {return d;});
 
-	newtotals = $.map(totals, function(value, index) { 
-		value.Week = index;
-		return value
+	}
+
+	function showWeek(weekNumber) {
+
+		removeG();
+
+		console.log(weekNumber);
+
+		var indices = []
+		for (var ind in s6.Week) {
+			if (s6.Week[ind] == weekNumber) {
+				indices.push(ind);
+			}
+		}
+
+		console.log(indices);
+
+		var days = [];
+		var dayTotals = [];
+
+		for (var i in indices) {
+			var obj = {activities:[]};
+			var y0 = 0;
+			for (var thing in s6) {
+				obj[thing] = s6[thing][indices[i]];
+				if (typeof obj[thing] == "number" && thing != "Week" && thing != "Total") {
+					console.log(thing, obj[thing], y0, obj.activities);
+					obj.activities.push({name: thing, y0: y0, y1: y0 + obj[thing]});
+					y0 = y0 + obj[thing];
+				}
+			}
+			days.push(obj);
+			dayTotals.push(obj.Total);
+		}
+		console.log('days', days);
+		console.log('dayTotals', dayTotals);
+
+		x.domain(days.map(function(day){return day.Day}));
+		y.domain([0, d3.max(dayTotals) + 1]);
+
+		// make svg groups for title and x and y axes
+		makeTitle("Week " + weekNumber);
+		makeXAxis("Day");
+		makeYAxis();
+
+		// the real deal
+		var day = svg.selectAll(".day")
+			.data(days)
+			.enter().append("g")
+				.attr("class", "g")
+				.attr("transform", function(d){return "translate(" + x(d.Day) +", 0)"; })
+				.on("mouseover", function(d){
+					$(this).children().css(mouseoverStyle); 
+					$("g .x.axis > .tick > text").filter(function() {return $(this).html() == d.Day}).css("font-size", "1.5em");
+				})
+				.on("mouseout", function(d){
+					$(this).children().css(mouseOutStyle);
+					$("g .x.axis > .tick > text").css("font-size", "1em");
+				})
+				.on("click", function(d){
+					showYear();
+				});
+
+		day.selectAll("rect")
+			.data(function(d) { console.log(d); return d.activities; })
+			.enter().append("rect")
+				.attr("class", function(d) { return convertToClass(d.name); })
+				.attr("width", x.rangeBand())
+				.attr("y", function(d) {return y(d.y1); })
+				.attr("height", function(d) { return y(d.y0) - y(d.y1); })
+				.style("fill", function(d) {return color(d.name); });
+
+		var legend = svg.selectAll(".legend")
+			.data(color.domain().slice().reverse())
+			.enter().append("g")
+				.attr("class", "legend")
+				.attr("transform", function(d, i) {return "translate(0, " + i*20 + ")"});
+
+		legend.append("rect")
+			.attr("class", function(d) { return convertToClass(d); })
+			.attr("x", width + margin.right - 28)
+			.attr("width", 18)
+			.attr("height", 18)
+			.style("fill", color)
+			.on("mouseover", function(d) {$("."+convertToClass(d)).css(mouseoverStyle);})
+			.on("mouseout", function(d) {$("."+convertToClass(d)).css(mouseOutStyle)});
+
+		legend.append("text")
+			.attr("class", function(d) { return convertToClass(d); })
+			.attr("x", width + margin.right - 34)
+			.attr("y", 9)
+			.attr("dy", ".35em")
+			.style("text-anchor", "end")
+			.text(function(d) {return d;});
+	}
+
+	function removeG () {
+		svg.selectAll("g").remove()
+	}
+
+	$("g .x.axis > .tick > text").on("mouseover", function(){
+		console.log("eehhhh");
 	})
-
-	// var mask = svg.selectAll(".mask")
-	// 	.data([0])
-	// 	.enter().append("g")
-	// 		.attr("class", "mask")
-
-	// mask.append("rect")
-	// 	.attr("x", 0)
-	// 	.attr("y", 0)
-	// 	.attr("width", width + margin.left + margin.right)
-	// 	.attr("height", height + margin.top + margin.bottom)
-	// 	.style(maskDefaultStyle);
-
-	var week = svg.selectAll(".week")
-		.data(newtotals)
-		.enter().append("g")
-			.attr("class", "g")
-			.attr("transform", function(d){return "translate(" + x(d.Week) +", 0)"; });
-
-	week.selectAll("rect")
-		.data(function(d) { return d.activities; })
-		.enter().append("rect")
-			.attr("class", function(d) { return convertToClass(d.name); })
-			.attr("width", x.rangeBand())
-			.attr("y", function(d) {return y(d.y1); })
-			.attr("height", function(d) { return y(d.y0) - y(d.y1); })
-			.style("fill", function(d) {return color(d.name); })
-
-
-	var legend = svg.selectAll(".legend")
-		.data(color.domain().slice().reverse())
-		.enter().append("g")
-			.attr("class", "legend")
-			.attr("transform", function(d, i) {return "translate(0, " + i*20 + ")"});
-
-	legend.append("rect")
-		.attr("class", function(d) { return convertToClass(d); })
-		.attr("x", width + margin.right - 28)
-		.attr("width", 18)
-		.attr("height", 18)
-		.style("fill", color)
-		.on("mouseover", function(d) {$("."+convertToClass(d)).css(mouseoverStyle);})
-		.on("mouseout", function(d) {$("."+convertToClass(d)).css(mouseOutStyle)});
-
-	legend.append("text")
-		.attr("class", function(d) { return convertToClass(d); })
-		.attr("x", width + margin.right - 34)
-		.attr("y", 9)
-		.attr("dy", ".35em")
-		.style("text-anchor", "end")
-		.text(function(d) {return d;});
-
-
-	
-
-
-
 	
 </script>
 

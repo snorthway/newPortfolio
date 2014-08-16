@@ -5,7 +5,6 @@
 {% block extrahead %}
 <style type="text/css">
 
-
 	.tick, 
 	text {
 		fill: #ccc;
@@ -27,11 +26,15 @@
 		z-index: 100;
 	}
 
+	g.g {
+		cursor: pointer;
+	}
+
 </style>
 {% endblock %}
 
 {% block content %}
-	<div id="map"></div>
+		<div id="map"></div>	
 {% endblock %}
 
 {% block extrajs %}
@@ -58,11 +61,11 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 	}
 
 	// many thanks to http://bl.ocks.org/mbostock/3886208
-
 	// margins
 	var margin = {top: 45, right: 140, bottom: 60, left: 40}
+
 	// width and height
-	var width = 960 - margin.left - margin.right; 
+	var width = 960 - margin.left - margin.right;
 	var height = 600 - margin.top - margin.bottom;
 
 	// datums

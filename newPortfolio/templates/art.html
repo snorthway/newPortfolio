@@ -11,6 +11,11 @@
 		cursor: pointer;
 	}
 
+	.shift > img {
+		width: 0.75em;
+		height: 0.75em;
+	}
+
 	.shift:hover {
 		color: #666E73;
 	}
@@ -38,7 +43,7 @@
 {% endblock %}
 
 {% block content %}
-<div id="accordion" >
+<div id="accordion">
 
 	<div class="container sixteen columns section">
 			<h3>Photography</h3>
@@ -46,8 +51,12 @@
 	</div>
 	<div class="container sixteen columns photo-container">
 		<span class="container fifteen columns center slide-buttons">
-			<span class="shift prev">&#60;</span>
-			<span class="shift next">&#62;</span>
+			<span class="shift prev">
+				<img src="{{ url_for('static', filename='img/left.svg') }}">
+			</span>
+			<span class="shift next">
+				<img src="{{ url_for('static', filename='img/right.svg') }}">
+			</span>
 		</span>
 		<div class="container fifteen columns center">
 			<img class="slide photo" src="{{ url_for('static', filename='photo/0') }}">
@@ -61,8 +70,12 @@
 	<div class="container sixteen columns drawing-container">
 		<span class="container fifteen columns center coming-soon">Coming Soon</span>
 		<span class="container fifteen columns center slide-buttons">
-			<span class="shift prev">&#60;</span>
-			<span class="shift next">&#62;</span>
+			<span class="shift prev">
+				<img src="{{ url_for('static', filename='img/left.svg') }}">
+			</span>
+			<span class="shift next">
+				<img src="{{ url_for('static', filename='img/right.svg') }}">
+			</span>
 		</span>
 		<div class="container fifteen columns center">
 			<img class="slide drawing" src="{{ url_for('static', filename='drawing_painting/pendoodle.jpg') }}">
@@ -76,8 +89,12 @@
 	<div class="container sixteen columns etcetera-container">
 		<span class="container fifteen columns center coming-soon">Coming Soon</span>
 		<span class="container fifteen columns center slide-buttons">
-			<span class="shift prev">&#60;</span>
-			<span class="shift next">&#62;</span>
+			<span class="shift prev">
+				<img src="{{ url_for('static', filename='img/left.svg') }}">
+			</span>
+			<span class="shift next">
+				<img src="{{ url_for('static', filename='img/right.svg') }}">
+			</span>
 		</span>
 		<div class="container fifteen columns center">
 			<img class="slide etcetera" src="{{ url_for('static', filename='etcetera/dumpster.jpg') }}">

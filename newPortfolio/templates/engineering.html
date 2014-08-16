@@ -1,12 +1,35 @@
 {% extends "base.html" %}
 
+{% block extrahead %}
+<style type="text/css">
+	.project-info {
+		text-align: left;
+	}
+
+	.logo-span {
+		display: inline;		
+	}
+
+	.logo {
+		width: 1em;
+		height: 1em;
+		margin-right: 0.5em;
+		margin-top: 0.25em;
+		float: right;
+		position: relative;
+		top: 50%;
+	}
+
+</style>
+{% endblock %}
+
 {% block navbar %}
 {% set engActive = 'active' %}
 {% include 'navbar.html' %}
 {% endblock %}
 
 {% block content %}
-<div class="container four columns">
+<div class="container four columns" style="display:none;">
 	<h3>Solar Camera</h3>
 	<h3>TrANTsporter</h3>
 	<h3>Asteroid Simulaton</h3>
@@ -27,4 +50,80 @@
 	<h3>NeuroScouting - Full Stack Development</h3>
 	<h3>Continuum - Finite State Machine; Database Design; Raspberry Pi Development; Systems Integration; Graph</h3>
 </div>
+<div class="container sixteen columns">
+	<p>Most of these are still very high-level overviews. More complete content coming soon.</p>
+</div>
+
+<div id="accordion">
+
+	<div class="container sixteen columns section">
+			<h3>Productivity
+				<span class="logo-span">
+					<img src="{{ url_for('static', filename='img/d3logo.svg') }}" class="logo">
+				</span>
+			</h3>
+			<hr class="section-divider">
+	</div>
+	<div class="container sixteen columns">
+		<div class="container fifteen columns center">
+		<div class="container six columns project-info">
+				<p>I tracked the amount of time I spent on every single out-of-class activity and graphed the results with d3.js. It was meant as an exercise in consistency, and later as an exercise to learn d3. It taught me a lot about my habits, and now you can check them out as well. Word of warning: it's not responsive yet, so it'll only look good if you're on something 960+ pixels wide.</p>
+			</div>
+			<div class="container eight columns">
+				<a href="{{ url_for('productivity') }}"><img class="slide" src="{{ url_for('static', filename='img/wark.png') }}"></a>
+			</div>			
+		</div>
+	</div>
+
+	<div class="container sixteen columns section" style="display:none;">
+		<h3>CNC Music Visualizer</h3>
+		<hr class="section-divider">
+	</div>
+	<div class="container sixteen columns drawing-container">
+		<div class="container fifteen columns center">
+			<p>Working in a team of four, I used Python running on two CEE microcontrollers to control the movements of the CNC in response to audio input.</p>
+		</div>
+	</div>
+
+	<div class="container sixteen columns section">
+		<h3>Theremin
+			<span class="logo-span">
+				<img src="{{ url_for('static', filename='img/circuits_inverted.png') }}" class="logo">
+			</span>
+		</h3>
+		<hr class="section-divider">
+	</div>
+	<div class="container sixteen columns drawing-container">
+		<div class="container fifteen columns center">
+			<p>Working in a team of four, I designed and built a playable analog theremin.</p>
+		</div>
+	</div>
+
+	<div class="container sixteen columns section">
+		<h3>Physarum Experiment
+			<span class="logo-span">
+				<img src="{{ url_for('static', filename='img/d3logo.svg') }}" class="logo">
+				<img src="{{ url_for('static', filename='img/circuits_inverted.png') }}" class="logo">
+			</span>
+		</h3>
+		<hr class="section-divider">
+	</div>
+	<div class="container sixteen columns etcetera-container">
+		<div class="container fifteen columns center">
+			<p>I conducted an experiment to attempt to simulate Boston's transportation systems with the emergent structures of slime mold <i>physarum polycephalum</i>. As part of the experiment I built an intervalometer and set up my camera to do a time-lapse of the process. I also wrote a minimum spanning tree algorithm which I implemented in d3.js.</p>
+		</div>
+	</div>
+</div>
+	
+{% endblock %}
+
+{% block extrajs %}
+<script type="text/javascript">
+	$(function() {
+		console.log('helloooo');
+		$( "#accordion" ).accordion();	
+	});
+
+</script>
+
 {% endblock %}

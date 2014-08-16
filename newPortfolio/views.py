@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-from flask import render_template
+from flask import render_template, url_for
 
 from newPortfolio import app, db_util
 
@@ -15,7 +15,8 @@ def contact():
 
 @app.route('/art')
 def art():
-	return render_template('art.html')
+	num_photos = len(os.listdir("%s/photo" % app.static_folder))
+	return render_template('art.html', num_photos=num_photos)
 
 @app.route('/blog')
 @app.route('/blog/<title>')
@@ -38,7 +39,7 @@ def physarum():
 def productivity():
 
 	# Get and read csv
-	csv_file = '/home/snorthway/portfolio/newPortfolio/newPortfolio/static/other/s6.csv'
+	csv_file = "%s/other/s6.csv" % app.static_folder
 	s6 = pd.read_csv(csv_file)
 
 	# Make a new df of the totals for each week (started on a Tuesday, hence the - 5)

@@ -1,8 +1,8 @@
 <div class="container eight columns offset-by-seven">
 	<ul id="nav-list" style="display: inline;">
-		<li><a href="{{ url_for('home') }}">Home</a></li>
-		<li><a href="{{ url_for('engineering') }}">Engineering</a></li>
-		<li><a href="{{ url_for('art') }}">Art</a></li>
-		<li><a href="{{ url_for('contact') }}">Contact</a></li>
+		<li><a href="{{ url_for('home') }}" class="{{ aboutActive }}">About</a></li>
+		<li><a href="{{ url_for('engineering') }}" class="{{ engActive }}">Engineering</a></li>
+		<li><a href="{{ url_for('art') }}" class="{{ artActive }}">Art</a></li>
+		<li><a href="{{ url_for('contact') }}" class="{{ contactActive }}">Contact</a></li>
 	</ul>
 </div>

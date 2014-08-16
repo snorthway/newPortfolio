@@ -6,17 +6,25 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta name="description" content="Stephanie Northway: Engineer, Designer, Artist">
 		<!-- Links for CSS and JS go here -->
-		<link href='http://fonts.googleapis.com/css?family=Roboto:300,400,500' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Roboto:300,400' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" href="{{ url_for('static', filename='css/all.css') }}" type="text/css" charset="utf-8" />
 		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/skeleton.css') }}">
+		<script type="text/javascript" src="{{ url_for('static', filename='js/jquery-ui-1.11.0.custom/external/jquery/jquery.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/jquery-ui-1.11.0.custom/jquery-ui.min.js') }}"></script>
 		{% block extrahead %}
 		{% endblock %}
 	</head>
 	<body>
 		<div id="nav-container">
 			<div class="container sixteen columns">
-				<div>
-					<img id="banner" src="{{ url_for('static', filename='img/banner.jpg') }}">
+				<div id="banner" style="background-image: url({{ url_for('static', filename='img/banner.png') }});">
+					<!-- <img id="banner" src="{{ url_for('static', filename='img/banner.png') }}"> -->
+					<span class="name" style="margin-bottom: 10px;">
+						<h1>STEPHANIE</h1>
+						<h1 id="last-name">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NORTHWAY</h1>
+					</span>
+					<!-- </img> -->
 					{% block navbar %}{% endblock %}
 				</div>
 			</div>
@@ -25,7 +33,7 @@
 			{% block content %}{% endblock %}
 			<footer class="container sixteen columns">
 				<hr>
-				<p>&copy; Stephanie Northway 2014</p>
+				<p class="footer">&copy; Stephanie Northway 2014 &ndash; Built with <a href="http://flask.pocoo.org/">Flask</a>, <a href="http://www.getskeleton.com/">Skeleton</a> and <a href="http://jqueryui.com/">jQuery UI</a></p>
 			</footer>
 		</div>
 		{% block extrajs %}{% endblock %}

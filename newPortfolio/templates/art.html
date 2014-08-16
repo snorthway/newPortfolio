@@ -1,20 +1,131 @@
 {% extends "base.html" %}
 
+{% block extrahead %}
+<style type="text/css">
+	.shift {
+		vertical-align: middle;
+		/*height: inherit;*/
+		position: relative;
+		top: 40%;
+		font-size: 3em;
+		cursor: pointer;
+	}
+
+	.shift:hover {
+		color: #666E73;
+	}
+
+	.prev {
+		float: left;
+		margin-left: 2em;
+	}
+	.next {
+		float: right;
+		margin-right: 2em;
+	}
+
+	.coming-soon {
+		visibility: hidden;
+	}
+
+
+</style>
+{% endblock %}
+
 {% block navbar %}
+{% set artActive = 'active' %}
 {% include 'navbar.html' %}
 {% endblock %}
 
 {% block content %}
-<div class="container one-third column center">
-	<a href="{{ url_for('people') }}"><img src="{{ url_for('static', filename='photo/IMG_1953_edited-1.jpg') }}"></a>
-	<h3>People</h3>
+<div id="accordion" >
+
+	<div class="container sixteen columns section">
+			<h3>Photography</h3>
+			<hr class="section-divider">
+	</div>
+	<div class="container sixteen columns photo-container">
+		<span class="container fifteen columns center slide-buttons">
+			<span class="shift prev">&#60;</span>
+			<span class="shift next">&#62;</span>
+		</span>
+		<div class="container fifteen columns center">
+			<img class="slide photo" src="{{ url_for('static', filename='photo/0') }}">
+		</div>
+	</div>
+
+	<div class="container sixteen columns section">
+		<h3>Drawing and Painting</h3>
+		<hr class="section-divider">
+	</div>
+	<div class="container sixteen columns drawing-container">
+		<span class="container fifteen columns center coming-soon">Coming Soon</span>
+		<span class="container fifteen columns center slide-buttons">
+			<span class="shift prev">&#60;</span>
+			<span class="shift next">&#62;</span>
+		</span>
+		<div class="container fifteen columns center">
+			<img class="slide drawing" src="{{ url_for('static', filename='drawing_painting/pendoodle.jpg') }}">
+		</div>
+	</div>
+
+	<div class="container sixteen columns section">
+		<h3>Etcetera</h3>
+		<hr class="section-divider">
+	</div>
+	<div class="container sixteen columns etcetera-container">
+		<span class="container fifteen columns center coming-soon">Coming Soon</span>
+		<span class="container fifteen columns center slide-buttons">
+			<span class="shift prev">&#60;</span>
+			<span class="shift next">&#62;</span>
+		</span>
+		<div class="container fifteen columns center">
+			<img class="slide etcetera" src="{{ url_for('static', filename='etcetera/dumpster.jpg') }}">
+		</div>
+	</div>
 </div>
-<div class="container one-third column center">
-	<a href=""><img src="{{ url_for('static', filename='photo/IMG_4392_edited-2.jpg') }}"></a>
-	<h3>Nature</h3>
-</div>
-<div class="container one-third column center">
-	<a href=""><img src="{{ url_for('static', filename='photo/IMG_1254_edited-1.jpg') }}"></a>
-	<h3>Etcetera</h3>
-</div>
+	
+{% endblock %}
+
+{% block extrajs %}
+<script type="text/javascript">
+	$(function() {
+		console.log('helloooo');
+		$( "#accordion" ).accordion();
+
+
+		var currentPhoto = 0;
+		$(".photo-container").find(".shift.next").on("click", function(e){
+			if (currentPhoto < {{ num_photos }}-1) {
+				currentPhoto += 1;
+			}
+			else {
+				currentPhoto = 0;
+			}
+			$(".slide.photo").prop("src", "{{ url_for('static', filename='photo/currentPhoto')}}".replace("currentPhoto", String(currentPhoto)));
+		});
+
+		$(".photo-container").find(".shift.prev").on("click", function(e){
+			if (currentPhoto > 0) {
+				currentPhoto -= 1;
+			}
+			else {
+				currentPhoto = {{ num_photos }}-1;
+			}
+			$(".slide.photo").prop("src", "{{ url_for('static', filename='photo/currentPhoto')}}".replace("currentPhoto", String(currentPhoto)));
+		});
+
+		$(".drawing-container").find(".shift").on("click", function(){
+			$(".drawing-container").find(".coming-soon").css("visibility", "visible");
+		});
+
+		$(".etcetera-container").find(".shift").on("click", function(){
+			$(".etcetera-container").find(".coming-soon").css("visibility", "visible");
+		});
+
+	});
+
+	
+
+</script>
 {% endblock %}

@@ -1,4 +1,5 @@
 venv
 *.pyc
 *.pdf
-conver
+convert_pdf.py
+uploadStatic.py

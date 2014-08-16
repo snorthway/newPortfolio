@@ -15,7 +15,10 @@ def contact():
 
 @app.route('/art')
 def art():
-	num_photos = len(os.listdir("%s/photo" % app.static_folder))
+	try:
+		num_photos = len(os.listdir("%s/photo" % app.static_folder))
+	except:
+		num_photos = 53
 	return render_template('art.html', num_photos=num_photos)
 
 @app.route('/blog')

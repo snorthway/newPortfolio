@@ -43,8 +43,12 @@ h1 {
 	margin-bottom: 0;
 }
 
+h1#first-name{
+	padding-top:20px;
+}
+
 h1#last-name {
-	margin-bottom: 20px;
+	padding-bottom: 10px;
 }
 
 img {

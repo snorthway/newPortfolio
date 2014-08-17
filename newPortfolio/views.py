@@ -6,8 +6,8 @@ from flask import render_template, url_for
 from newPortfolio import app, db_util
 
 @app.route('/')
-def home():
-	return render_template('home.html')
+def about():
+	return render_template('about.html')
 
 @app.route('/contact')
 def contact():

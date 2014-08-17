@@ -120,8 +120,9 @@
 {% block extrajs %}
 <script type="text/javascript">
 	$(function() {
-		console.log('helloooo');
-		$( "#accordion" ).accordion();	
+		$( "#accordion" ).accordion({
+			heightStyle: "content"
+		});	
 	});
 
 </script>

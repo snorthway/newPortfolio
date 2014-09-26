@@ -23,6 +23,12 @@
 		  ga('send', 'pageview');
 
 		</script>
+		<style type="text/css">
+			body {
+				background-image: url("{{ url_for('static', filename='img/dvsup_darker.png') }}");
+				background-repeat: repeat;
+			}
+		</style>
 		{% block extrahead %}
 		{% endblock %}
 	</head>
@@ -30,10 +36,10 @@
 		<div id="nav-container">
 			<div class="container sixteen columns">
 				<div id="banner" style="background-image: url({{ url_for('static', filename='img/banner.png') }});">
-					<span class="name">
+					<a href="{{ url_for('about') }}"><span class="name">
 						<h1 id="first-name">STEPHANIE</h1>
 						<h1 id="last-name">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NORTHWAY</h1>
-					</span>
+					</span></a>
 					<!-- </img> -->
 					{% block navbar %}{% endblock %}
 				</div>
@@ -43,7 +49,7 @@
 			{% block content %}{% endblock %}
 			<footer class="container sixteen columns">
 				<hr>
-				<p class="footer">&copy; Stephanie Northway 2014 &ndash; Built with <a href="http://flask.pocoo.org/">Flask</a>, <a href="http://www.getskeleton.com/">Skeleton</a> and <a href="http://jqueryui.com/">jQuery UI</a></p>
+				<p class="footer">&copy; Stephanie Northway 2014 &ndash; Built with <a href="http://flask.pocoo.org/">Flask</a>, <a href="http://www.getskeleton.com/">Skeleton</a> and <a href="http://jquery.com/">jQuery</a></p>
 			</footer>
 		</div>
 		{% block extrajs %}{% endblock %}

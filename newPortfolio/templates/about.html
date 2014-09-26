@@ -1,5 +1,20 @@
 {% extends "base.html" %}
 
+{% block extrahead %}
+<style type="text/css">
+	span.i {
+		font-family: 'Roboto Slab';
+		font-size: 1.5em;
+		font-weight: 300; 
+	}
+	.emph {
+		font-family: 'Roboto Slab';
+		font-size: 1.1em;
+		font-weight: 300;
+	}
+</style>
+{% endblock %}
+
 {% block navbar %}
 {% set aboutActive = 'active' %}
 {% include "navbar.html" %}
@@ -12,7 +27,7 @@
 	</div>
 	<div class="container ten columns offset-by-one">
 		<p>
-		Hi! I'm Steph. I'm a senior at <a href="http://olin.edu/">Franklin W. Olin College of Engineering</a>, majoring in Electrical and Computer Engineering. I'm passionate about user-centered design, the future of the planet and moving electrons around in clever ways. In the meantime I also write a lot of code and make a little art. This is where I keep the work I'm proud of, so please take a look around.
+		<span class="emph">Hi! I'm Steph.</span> I'm a senior in electrical and computer engineering at <a class="emph" href="http://olin.edu/">Franklin W. Olin College of Engineering</a>, My work experience spans all aspects of <span class="emph">web development</span> from wireframing to database design, and my passions are in <span class="emph">user-centered design</span> and <span class="emph">sustainability</span>. To round out my eclectic skill set I also do <span class="emph">art</span> &ndash; both the visual and martial varieties. If you're looking for a resume it's <a class="emph" href="{{ url_for('resume') }}">here</a>, but make sure to check out my <a class="emph" href="{{ url_for('engineering') }}">projects</a> and <a class="emph" href="{{ url_for('art') }}">artwork</a> as well. If you have opinions about any of my work, are interested in hiring me or just want to chat, don't hesitate to <a class="emph" href="{{ url_for('contact') }}">reach out</a>.
 		</p>
 	</div>
 </div>

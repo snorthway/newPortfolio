@@ -1,5 +1,19 @@
 {% extends "base.html" %}
 
+{% block extrahead %}
+<style type="text/css">
+	.emph {
+		font-family: 'Roboto Slab';
+		font-size: 1.1em;
+		font-weight: 300;
+	}
+
+	address {
+		margin-bottom: 1em;
+	}
+</style>
+{% endblock %}
+
 {% block navbar %}
 {% set contactActive = 'active' %}
 {% include 'navbar.html' %}
@@ -7,8 +21,16 @@
 
 {% block content %}
 <div class="container sixteen columns">
-	<p>Thanks for your interest! Feel free to email me any time at <a href="mailto:stephanie.northway@gmail.com">stephanie.northway@gmail.com</a>, especially if you want to hire me and/or have opinions on how I can make this site better.</p>
-	<p>If you'd like to send me something physical, you can do so here:</p>
+	<p><span class="emph">Thanks for your interest!</span>
+	<br/>
+	In order from most effective to least, here is how you can get in touch with me:</p>
+</div>
+<div class="container fifteen columns offset-by-one">
+	<p>Email me at <a href="mailto:stephanie.northway@gmail.com">stephanie.northway@<span class="emph">gmail</span>.com</a></p>
+	<p>Email me at <a href="mailto:stephanie.northway@students.olin.edu">stephanie.northway@<span class="emph">students</span>.olin.edu</a></p>
+	<p>Message me on <a class="emph" href="https://www.linkedin.com/pub/stephanie-northway/54/b59/795">LinkedIn</a></p>
+	<p>Tweet <a class="emph" href="https://twitter.com/sn0rthway">@sn0rthway</a></p>
+	<p>Send me <span class="emph">mail</span> at:</p>
 	<address>
 		1000 Olin Way
 		<br>
@@ -16,5 +38,6 @@
 		<br>
 		Needham, MA 02492
 	</address>
+
 </div>
 {% endblock %}

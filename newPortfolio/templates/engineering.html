@@ -55,13 +55,13 @@
 	<h3>Continuum - Finite State Machine; Database Design; Raspberry Pi Development; Systems Integration; Graph</h3>
 </div>
 <div class="container sixteen columns">
-	<p>Most of these are still very high-level overviews. More complete content coming soon.</p>
+	<p>Below is a collection of various engineering projects I've done, both for school and for fun.</p>
 </div>
 
 <div id="accordion">
 
 	<div class="container sixteen columns section">
-			<h3>Productivity
+			<h3>Visualizing Productivity
 				<span class="logo-span">
 					<img src="{{ url_for('static', filename='img/d3logo.svg') }}" class="logo" title="D3.js">
 				</span>
@@ -80,6 +80,7 @@
 			</div>
 			<div class="container eight columns">
 				<a href="{{ url_for('productivity') }}"><img class="slide" src="{{ url_for('static', filename='img/wark.png') }}"></a>
+				<p class="caption">Check out the interactive graph here.</p>
 			</div>			
 		</div>
 	</div>
@@ -110,7 +111,7 @@
 		</h3>
 		<hr class="section-divider">
 	</div>
-	<div class="container sixteen columns drawing-container">
+	<div class="container sixteen columns" style="display:none;">
 		<div class="container fifteen columns center">
 			<p>Working in a team of four, I designed and built a playable analog theremin.</p>
 		</div>
@@ -125,9 +126,16 @@
 		</h3>
 		<hr class="section-divider">
 	</div>
-	<div class="container sixteen columns etcetera-container">
-		<div class="container fifteen columns center">
-			<p>I conducted an experiment to attempt to simulate Boston's transportation systems with the emergent structures of slime mold <i>physarum polycephalum</i>. As part of the experiment I built an intervalometer and set up my camera to do a time-lapse of the process. I also wrote a minimum spanning tree algorithm which I implemented in d3.js.</p>
+	<div class="container sixteen columns">
+		<div class="container fifteen columns">
+			<div class="container eight columns center">
+				<a href="{{url_for('physarum')}}"><img src="{{url_for('static', filename='eng/physarum.png')}}" class="slide"></a>
+				<p class="caption">Minimum spanning tree of the most populous cities in the Greater Boston Area, superimposed on the slime mold network.</p>
+			</div>
+			<div class="container six columns">
+				<p>As an individual project for Sustainable Design class, I decided to explore biomimicry by studying how slime mold forms networks to transport nutrients. I conducted an experiment to attempt to simulate Boston's transportation systems with the emergent structures of the slime mold <i>physarum polycephalum</i>. In a petri dish, I laid out food sources in the arrangement of Boston's most populous cities (I put salt where the ocean would be to discourage formation of plasmodia there).</p>
+				<p> As part of the experiment I built an intervalometer for my SLR and set it up to do a time-lapse of the process. I also wrote a minimum spanning tree algorithm which I implemented in d3.js, which generated the graph on the left. Many things did not go as planned with this experiment, but I learned a lot in the process.</p>
+			</div>
 		</div>
 	</div>
 </div>

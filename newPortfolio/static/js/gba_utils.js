@@ -14,7 +14,7 @@ svg=d3.select("#map")
 .append("svg")
 .attr("width",w)
 .attr("height",h)
-.style("background-color", "white");
+.style("background-color", "black");
 
 // figure out where to display the nodes
 function centerPlace(d, axis){

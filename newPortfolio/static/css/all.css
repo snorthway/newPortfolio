@@ -11,6 +11,10 @@ p {
 	font-size: 1.15em;
 }
 
+p.caption {
+	font-size: 1em;
+}
+
 p.footer {
 	font-size: 1em;
 }
@@ -72,7 +76,7 @@ img {
 
 #nav-list > li {
 	font-family: 'Roboto', sans-serif;
-	font-size: 1.5em;
+	font-size: 1.45em;
 	font-weight: 300;
 	float: left;
 	list-style-type: none;
@@ -91,9 +95,14 @@ li > a.active {
 	border-bottom: 1px solid #F2C8A2;
 }
 
+a > img:hover {
+	border: 1px solid #F2C8A2;;
+}
+
 img.slide {
 	max-width: 100%;
 	max-height: 500px;
+	border: 1px solid transparent;
 }
 
 .center {

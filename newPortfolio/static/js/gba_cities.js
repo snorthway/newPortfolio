@@ -57,9 +57,9 @@ d3.csv(csv_url, function(csv){
 
 	// style and position and text
 	var labelAttributes = labels
-	.style("font-size", "10px")
+	.style("font-size", "12px")
 	.style("fill","white")
-	.attr("x", function (d){return centerPlace(d, "x")})
+	.attr("x", function (d){return centerPlace(d, "x") + 5})
 	.attr("y", function (d){return centerPlace(d, "y")})
 	.text(function (d){return d["City"]});
 
@@ -82,16 +82,16 @@ d3.csv(csv_url, function(csv){
 	var grid = makeGrid();
 
 	// show grid nodes
-	gridNodes = svg.selectAll("rect")
-	.data(grid)
-	.enter()
-	.append("rect")
-	.attr("x", function (d){return d.x})
-	.attr("y", function (d){return d.y})
-	.attr("width", 2)
-	.attr("height", 2)
-	.style("fill", "green")
-	.style("stroke", "green");
+	// gridNodes = svg.selectAll("rect")
+	// .data(grid)
+	// .enter()
+	// .append("rect")
+	// .attr("x", function (d){return d.x})
+	// .attr("y", function (d){return d.y})
+	// .attr("width", 2)
+	// .attr("height", 2)
+	// .style("fill", "green")
+	// .style("stroke", "green");
 
 
 
